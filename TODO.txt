@@ -1,0 +1,9 @@
+Definitely
+----------
+Make a chat message model
+Make a view that shows the most recent N messages and has a form to create a new one
+Make the template and URL for that view
+
+Maybe
+-----
+Make an enhanced User model
