@@ -1,10 +1,10 @@
 # Django settings for telelogue project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+     ('Montana Rowe', 'calcnerd256@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -83,6 +83,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
+# TODO: hide this
 SECRET_KEY = 'w@lx8tflx+19_07d2!brukqlnc=35-ro3onmw7&ts40f6t$o7*'
 
 # List of callables that know how to import templates from various sources.
@@ -121,9 +122,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
