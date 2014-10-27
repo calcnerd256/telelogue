@@ -1,5 +1,7 @@
 # Django settings for telelogue project.
 
+from os import path
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -9,10 +11,20 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+BASE_PATH = path.dirname( # /path/to/project/repo/
+    path.dirname( # telelogue/
+        path.dirname( # settings/
+            path.abspath(
+                __file__ # __init__.py
+            )
+        )
+    )
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'telelogue_scratchy.sqlite3',                      # Or path to database file if using sqlite3.
+        'NAME': path.join(BASE_PATH, 'telelogue_scratchy.sqlite3'),                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
