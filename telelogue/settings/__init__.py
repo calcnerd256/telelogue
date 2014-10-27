@@ -104,7 +104,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'telelogue.urls'
+ROOT_URLCONF = 'telelogue.urls.telelogue'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'telelogue.wsgi.application'
