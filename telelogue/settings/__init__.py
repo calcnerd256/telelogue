@@ -116,6 +116,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Third-party middleware
+    'cuser.middleware.CuserMiddleware',
 )
 
 ROOT_URLCONF = 'telelogue.urls.telelogue'
@@ -140,7 +143,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
+
+    # Third-party apps
     "south",
+    "cuser",
+
+    # Our apps
     "chat",
 )
 
