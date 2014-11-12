@@ -8,3 +8,14 @@
 {% for message in object_list %}
     <li>{{ message.body|linebreaksbr }}</li>
 {% endfor %}
+{% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{page_obj.previous_page_number}}">&larr;</a>
+        {% endif %}
+        {{ page_obj }}
+        {% if page_obj.has_next %}
+            <a href="?page={{page_obj.next_page_number}}">&rarr;</a>
+        {% endif %}
+    </div>
+{% endif %}
