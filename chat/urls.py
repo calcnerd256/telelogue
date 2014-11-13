@@ -5,6 +5,11 @@ from chat.views import ChatHomeView
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^$', ChatHomeView.as_view(), name='home'),
+urlpatterns = patterns(
+    '',
+    url(
+        r'^$',
+        ChatHomeView.as_view(),
+        name='home',
+    ),
 )
