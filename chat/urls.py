@@ -9,8 +9,13 @@ from chat.views import (
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^$', ChatHomeView.as_view(), name='home'),
+urlpatterns = patterns(
+    '',
+    url(
+        r'^$',
+        ChatHomeView.as_view(),
+        name='home',
+    ),
     url(r'^message/create/$', MessageCreateView.as_view(), name='message_create'),
     url(r'^message/list/$', MessageListView.as_view(), name='message_list'),
 )
