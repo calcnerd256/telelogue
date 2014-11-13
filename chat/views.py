@@ -5,6 +5,7 @@ from django.views.generic import (
     DetailView,
 )
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from models import ChatMessage
 
 
@@ -30,3 +31,7 @@ class MessageListView(ListView):
 
 class MessageDetailView(DetailView):
     model = ChatMessage
+
+
+class UserDetailView(DetailView):
+    model = User
