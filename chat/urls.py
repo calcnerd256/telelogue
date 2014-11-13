@@ -4,6 +4,8 @@ from chat.views import (
     ChatHomeView,
     MessageCreateView,
     MessageListView,
+    MessageDetailView,
+    UserDetailView,
 )
 
 
@@ -16,6 +18,7 @@ urlpatterns = patterns(
         ChatHomeView.as_view(),
         name='home',
     ),
+
     url(
         r'^message/create/$',
         MessageCreateView.as_view(),
@@ -26,4 +29,7 @@ urlpatterns = patterns(
         MessageListView.as_view(),
         name='message_list',
     ),
+    url(r'^message/(?P<pk>\d+)/$', MessageDetailView.as_view(), name='message_detail'),
+
+    url(r'^user/(?P<pk>\d+)/$', UserDetailView.as_view(), name='user_detail'),
 )

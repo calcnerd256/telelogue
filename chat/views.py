@@ -2,8 +2,10 @@ from django.views.generic import (
     TemplateView,
     CreateView,
     ListView,
+    DetailView,
 )
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from models import ChatMessage
 
 
@@ -25,3 +27,11 @@ class MessageListView(ListView):
     def get_queryset(self):
         qs = super(MessageListView, self).get_queryset()
         return qs.order_by("-timestamp")
+
+
+class MessageDetailView(DetailView):
+    model = ChatMessage
+
+
+class UserDetailView(DetailView):
+    model = User
