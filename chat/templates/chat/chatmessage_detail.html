@@ -1,4 +1,6 @@
 Author: {{ object.author }}<br />
 Posted at: {{ object.timestamp }}<br />
 Body of message:<br />
-{{ object.body|linebreaksbr }}
+{{ object.body|linebreaksbr }}<br /><br />
+
+<a href="{% url 'message_list' %}">Back to the log</a>
