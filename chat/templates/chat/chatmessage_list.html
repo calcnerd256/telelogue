@@ -19,7 +19,9 @@
         </style>
     </head>
     <body>
-<a href="{% url 'message_create' %}">New message</a>
+<a href="{% url 'message_create' %}">
+    New message
+</a>
 <form method="POST" action="{% url "message_create" %}">
     {% csrf_token %}
     <label for="body">quick message:</label>
