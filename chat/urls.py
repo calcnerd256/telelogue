@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from chat.views import ChatHomeView
+from chat.views import (
+    ChatHomeView,
+)
 
 
 admin.autodiscover()
