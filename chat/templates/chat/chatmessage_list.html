@@ -1,4 +1,6 @@
 <a href="{% url 'message_create' %}">New message</a>
 {% for message in object_list %}
-    <li>{{ message.body|linebreaksbr }}</li>
+    <li>
+        {{ message.body|linebreaksbr }}
+    </li>
 {% endfor %}
