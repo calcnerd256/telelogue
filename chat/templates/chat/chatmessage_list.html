@@ -45,14 +45,22 @@
     </li>
 {% endfor %}
 {% if is_paginated %}
+
+    {% for page in page_obj.paginator.page_range %}
+           <a href="?page={{ page }}">{{ page }}</a>
+    {% endfor %}
     <div class="pagination">
-        {% if page_obj.has_previous %}
+           <span class="page-links">
+               {% if page_obj.has_previous %}
             <a href="?page={{page_obj.previous_page_number}}">&larr;</a>
-        {% endif %}
-        {{ page_obj }}
-        {% if page_obj.has_next %}
+               {% endif %}
+               <span class="page-current">
+                   Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+               </span>
+               {% if page_obj.has_next %}
             <a href="?page={{page_obj.next_page_number}}">&rarr;</a>
-        {% endif %}
+               {% endif %}
+           </span>
     </div>
 {% endif %}
     </body>
