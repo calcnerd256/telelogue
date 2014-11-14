@@ -1,15 +1,13 @@
 Definitely, and soon
 --------------------
-Make a view that shows the most recent N messages and has a form to create a new one
-Make the template and URL for that view
-Export and import
 Login screen
 
 Big features
 ------------
+Have some way to mark a TODO message as "done"
 Reminders
 "Snooze" a message ("remind me of this in 20 minutes")
 
 Maybe
 -----
-Make an enhanced User model
+Make a UserPreferences model
