@@ -2,7 +2,7 @@
     New message
 </a>
 {% for message in object_list %}
-    <li>
+    <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
         {{ message.body|linebreaksbr }}
     </li>
 {% endfor %}
