@@ -1,6 +1,29 @@
+<html>
+    <head>
+        <style>
+            li.ChatMessage{
+                border: 1px solid black;
+                border-radius: 10px;
+            }
+            li.ChatMessage.me{
+                opacity: 0.5;
+            }
+            li.ChatMessage.user_1{
+                /* calcnerd256 */
+                background: #80c0ff;
+            }
+            li.ChatMessage.user_2{
+                /* zhera */
+                background: #80ff80;
+            }
+        </style>
+    </head>
+    <body>
 <a href="{% url 'message_create' %}">New message</a>
 {% for message in object_list %}
     <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
         {{ message.body|linebreaksbr }}
     </li>
 {% endfor %}
+    </body>
+</html>
