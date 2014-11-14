@@ -4,7 +4,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     # url(r'^$', 'telelogue.views.home', name='home'),
     # url(r'^telelogue/', include('telelogue.foo.urls')),
     url(r'^chat/', include('chat.urls')),

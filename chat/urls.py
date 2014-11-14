@@ -11,12 +11,33 @@ from chat.views import (
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^$', ChatHomeView.as_view(), name='home'),
+urlpatterns = patterns(
+    '',
+    url(
+        r'^$',
+        ChatHomeView.as_view(),
+        name='home',
+    ),
 
-    url(r'^message/create/$', MessageCreateView.as_view(), name='message_create'),
-    url(r'^message/list/$', MessageListView.as_view(), name='message_list'),
-    url(r'^message/(?P<pk>\d+)/$', MessageDetailView.as_view(), name='message_detail'),
+    url(
+        r'^message/create/$',
+        MessageCreateView.as_view(),
+        name='message_create',
+    ),
+    url(
+        r'^message/list/$',
+        MessageListView.as_view(),
+        name='message_list',
+    ),
+    url(
+        r'^message/(?P<pk>\d+)/$',
+        MessageDetailView.as_view(),
+        name='message_detail',
+    ),
 
-    url(r'^user/(?P<pk>\d+)/$', UserDetailView.as_view(), name='user_detail'),
+    url(
+        r'^user/(?P<pk>\d+)/$',
+        UserDetailView.as_view(),
+        name='user_detail',
+    ),
 )
