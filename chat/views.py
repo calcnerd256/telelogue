@@ -35,3 +35,11 @@ class MessageDetailView(DetailView):
 
 class UserDetailView(DetailView):
     model = User
+
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        user = self.get_object()
+        context.update({
+            'todo_messages': user.chatmessage_set.filter(body__icontains='TODO'),
+        })
+        return context
