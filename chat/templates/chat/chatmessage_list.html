@@ -28,7 +28,16 @@
 </form>
 {% for message in object_list %}
     <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
-        {{ message.body|linebreaksbr }}
+        <span>
+            {{ message.author }}
+                        @
+                        <a href="{{ message.get_absolute_url }}">
+                            {{ message.timestamp }}
+                        </a>
+        </span>
+        <p>
+            {{ message.body|linebreaksbr }}
+        </p>
     </li>
 {% endfor %}
 {% if is_paginated %}
