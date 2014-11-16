@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from chat.views import (
     ChatHomeView,
     MessageCreateView,
@@ -21,23 +22,23 @@ urlpatterns = patterns(
 
     url(
         r'^message/create/$',
-        MessageCreateView.as_view(),
+        login_required(MessageCreateView.as_view()),
         name='message_create',
     ),
     url(
         r'^message/list/$',
-        MessageListView.as_view(),
+        login_requiredMessageListView.as_view()),
         name='message_list',
     ),
     url(
         r'^message/(?P<pk>\d+)/$',
-        MessageDetailView.as_view(),
+        login_requiredMessageDetailView.as_view()),
         name='message_detail',
     ),
 
     url(
         r'^user/(?P<pk>\d+)/$',
-        UserDetailView.as_view(),
+        login_requiredUserDetailView.as_view()),
         name='user_detail',
     ),
 )
