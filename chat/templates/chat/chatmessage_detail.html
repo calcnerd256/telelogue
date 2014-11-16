@@ -13,7 +13,7 @@
         <div>
             Body of message:
             <br />
-            {{ object.body|linebreaksbr }}
+<pre>{{ object.body|urlize }}</pre>
         </div>
         <a href="{% url 'message_list' %}">
             Back to the log
