@@ -5,16 +5,22 @@
         </title>
     </head>
     <body>
+        <ul>
+            <li>
         <a href="{% url 'message_create' %}">
             Say somethin'
         </a>
-        <br />
+            </li>
+            <li>
         <a href="{% url 'message_list' %}">
             View the log
         </a>
-        <br />
+            </li>
+            <li>
         <a href="{% url "admin:index" %}">
             administer
         </a>
+            </li>
+        </ul>
     </body>
 </html>
