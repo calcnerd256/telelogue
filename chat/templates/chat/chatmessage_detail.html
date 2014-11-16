@@ -2,7 +2,9 @@
     <body>
         <div>
             Author:
-            {{ object.author }}
+<a href="{{ object.get_author_url }}">
+    {{ object.author }}
+</a>
         </div>
         <div>
             Posted at:
