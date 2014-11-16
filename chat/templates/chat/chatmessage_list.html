@@ -22,12 +22,12 @@
         <a href="{% url 'message_create' %}">
             New message
         </a>
-<form method="POST" action="{% url "message_create" %}">
+        <form method="POST" action="{% url "message_create" %}">
             {% csrf_token %}
             <label for="body">quick message:</label>
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
             <input type="submit" value="say it"></input>
-</form>
+        </form>
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 {{ message.body|linebreaksbr }}
