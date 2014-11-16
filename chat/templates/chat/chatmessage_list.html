@@ -19,16 +19,16 @@
         </style>
     </head>
     <body>
-    <a href="{% url 'message_create' %}">
+        <a href="{% url 'message_create' %}">
         New message
-    </a>
+        </a>
     <form method="POST" action="{% url "message_create" %}">
     {% csrf_token %}
     <label for="body">quick message:</label>
     <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
     <input type="submit" value="say it"></input>
     </form>
-    {% for message in object_list %}
+        {% for message in object_list %}
         <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
         <span>
             <a href="{{ message.get_author_url }}">
@@ -43,14 +43,14 @@
         {{ message.body|linebreaksbr }}
         </p>
         </li>
-    {% endfor %}
-    {% if is_paginated %}
+        {% endfor %}
+        {% if is_paginated %}
 
         {% for page in page_obj.paginator.page_range %}
-           <a href="?page={{ page }}">{{ page }}</a>
+            <a href="?page={{ page }}">{{ page }}</a>
         {% endfor %}
         <div class="pagination">
-           <span class="page-links">
+            <span class="page-links">
                {% if page_obj.has_previous %}
             <a href="?page={{page_obj.previous_page_number}}">&larr;</a>
                {% endif %}
@@ -60,8 +60,8 @@
                {% if page_obj.has_next %}
             <a href="?page={{page_obj.next_page_number}}">&rarr;</a>
                {% endif %}
-           </span>
+            </span>
         </div>
-    {% endif %}
+        {% endif %}
     </body>
 </html>
