@@ -1,20 +1,20 @@
 <html>
     <body>
         <div>
-Author:
-{{ object.author }}
+            Author:
+            {{ object.author }}
         </div>
         <div>
-Posted at:
-{{ object.timestamp }}
+            Posted at:
+            {{ object.timestamp }}
         </div>
         <div>
-Body of message:
-<br />
-{{ object.body|linebreaksbr }}
+            Body of message:
+            <br />
+            {{ object.body|linebreaksbr }}
         </div>
-<a href="{% url 'message_list' %}">
-    Back to the log
-</a>
+        <a href="{% url 'message_list' %}">
+            Back to the log
+        </a>
     </body>
 </html>
