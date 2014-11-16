@@ -1,8 +1,12 @@
-User: {{ object.username }}<br /><br />
+User: {{ object.username }}
+<br />
+<br />
 
 Ideas for stuff to put here:
 <ul>
-    <li>All the tags this user has used so far</li>
+    <li>
+        All the tags this user has used so far
+    </li>
 </ul>
 <br />
 
@@ -18,9 +22,20 @@ TODO posts:
 
 Stats:
 <ul>
-    <li>Total message count: {{ message_count }}</li>
-    <li>HILY count: {{ HILY_count }}</li>
-    <li>HGWILY count: {{ HGWILY_count }}</li>
+    <li>
+        Total message count:
+        {{ message_count }}
+    </li>
+    <li>
+        HILY count:
+        {{ HILY_count }}
+    </li>
+    <li>
+        HGWILY count:
+        {{ HGWILY_count }}
+    </li>
 </ul>
 
-<a href="{% url 'message_list' %}">Back to the log</a>
+<a href="{% url 'message_list' %}">
+    Back to the log
+</a>

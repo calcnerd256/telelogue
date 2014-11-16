@@ -3,8 +3,15 @@ Author:
     {{ object.author }}
 </a>
 <br />
-Posted at: {{ object.timestamp }}<br />
-Body of message:<br />
-{{ object.body|linebreaksbr }}<br /><br />
+Posted at:
+{{ object.timestamp }}
+<br />
+Body of message:
+<br />
+{{ object.body|linebreaksbr }}
+<br />
+<br />
 
-<a href="{% url 'message_list' %}">Back to the log</a>
+<a href="{% url 'message_list' %}">
+    Back to the log
+</a>
