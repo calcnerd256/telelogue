@@ -23,11 +23,11 @@
             New message
         </a>
         <ul>
-        {% for message in object_list %}
+            {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
-                {{ message.body|linebreaksbr }}
+                    {{ message.body|linebreaksbr }}
             </li>
-        {% endfor %}
+            {% endfor %}
         </ul>
         {% if is_paginated %}
 
