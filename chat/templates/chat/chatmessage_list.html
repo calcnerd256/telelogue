@@ -28,6 +28,7 @@
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
             <input type="submit" value="say it"></input>
         </form>
+        <ul>
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 <span>
@@ -44,6 +45,7 @@
                 </p>
             </li>
         {% endfor %}
+        </ul>
         {% if is_paginated %}
 
             {% for page in page_obj.paginator.page_range %}
