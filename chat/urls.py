@@ -27,18 +27,18 @@ urlpatterns = patterns(
     ),
     url(
         r'^message/list/$',
-        login_requiredMessageListView.as_view()),
+        login_required(MessageListView.as_view()),
         name='message_list',
     ),
     url(
         r'^message/(?P<pk>\d+)/$',
-        login_requiredMessageDetailView.as_view()),
+        login_required(MessageDetailView.as_view()),
         name='message_detail',
     ),
 
     url(
         r'^user/(?P<pk>\d+)/$',
-        login_requiredUserDetailView.as_view()),
+        login_required(UserDetailView.as_view()),
         name='user_detail',
     ),
 )
