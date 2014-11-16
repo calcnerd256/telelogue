@@ -31,11 +31,11 @@
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 <span>
-                <a href="{{ message.get_author_url }}">{{ message.author }}</a>
+                    <a href="{{ message.get_author_url }}">{{ message.author }}</a>
                     @
-                <a href="{{ message.get_absolute_url }}">
+                    <a href="{{ message.get_absolute_url }}">
                         {{ message.timestamp }}
-                </a>
+                    </a>
                 </span>
                 <p>
                     {{ message.body|linebreaksbr }}
