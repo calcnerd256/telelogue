@@ -39,10 +39,12 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
         user_messages = self.get_object().chatmessage_set.all()
-        context.update({
+        context.update(
+          {
             'todo_messages': user_messages.filter(body__icontains='TODO'),
             'message_count': user_messages.count(),
             'HILY_count': user_messages.filter(body__contains='HILY').count(),
             'HGWILY_count': user_messages.filter(body__contains='HGWILY').count(),
-        })
+          }
+        )
         return context
