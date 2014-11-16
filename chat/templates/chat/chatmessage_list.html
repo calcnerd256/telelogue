@@ -22,11 +22,13 @@
         <a href="{% url 'message_create' %}">
             New message
         </a>
+        <ul>
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 {{ message.body|linebreaksbr }}
             </li>
         {% endfor %}
+        </ul>
         {% if is_paginated %}
 
             {% for page in page_obj.paginator.page_range %}
