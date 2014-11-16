@@ -30,15 +30,15 @@
         </form>
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
-            <span>
+                <span>
                 <a href="{{ message.get_author_url }}">{{ message.author }}</a>
-                @
+                    @
                 <a href="{{ message.get_absolute_url }}">
-                    {{ message.timestamp }}
+                        {{ message.timestamp }}
                 </a>
-            </span>
+                </span>
                 <p>
-                {{ message.body|linebreaksbr }}
+                    {{ message.body|linebreaksbr }}
                 </p>
             </li>
         {% endfor %}
