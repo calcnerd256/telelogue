@@ -10,3 +10,7 @@ class ChatMessage(models.Model):
 
     def get_absolute_url(self):
         return reverse('message_detail', kwargs={'pk': self.pk})
+
+    def get_author_url(self):
+        author = self.author
+        return reverse("user_detail", kwargs={"pk": author.pk})

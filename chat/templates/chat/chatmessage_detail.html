@@ -1,4 +1,8 @@
-Author: {{ object.author }}<br />
+Author:
+<a href="{{ object.get_author_url }}">
+    {{ object.author }}
+</a>
+<br />
 Posted at: {{ object.timestamp }}<br />
 Body of message:<br />
 <pre>{{ object.body|urlize }}</pre>
