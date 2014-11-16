@@ -22,23 +22,31 @@ urlpatterns = patterns(
 
     url(
         r'^message/create/$',
-        login_required(MessageCreateView.as_view()),
+        login_required(
+            MessageCreateView.as_view()
+        ),
         name='message_create',
     ),
     url(
         r'^message/list/$',
-        login_required(MessageListView.as_view()),
+        login_required(
+            MessageListView.as_view()
+        ),
         name='message_list',
     ),
     url(
         r'^message/(?P<pk>\d+)/$',
-        login_required(MessageDetailView.as_view()),
+        login_required(
+            MessageDetailView.as_view()
+        ),
         name='message_detail',
     ),
 
     url(
         r'^user/(?P<pk>\d+)/$',
-        login_required(UserDetailView.as_view()),
+        login_required(
+            UserDetailView.as_view()
+        ),
         name='user_detail',
     ),
 )

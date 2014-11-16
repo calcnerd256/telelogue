@@ -19,15 +19,15 @@
         </style>
     </head>
     <body>
-<a href="{% url 'message_create' %}">
+    <a href="{% url 'message_create' %}">
     New message
-</a>
-{% for message in object_list %}
+    </a>
+    {% for message in object_list %}
     <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
         {{ message.body|linebreaksbr }}
     </li>
-{% endfor %}
-{% if is_paginated %}
+    {% endfor %}
+    {% if is_paginated %}
 
     {% for page in page_obj.paginator.page_range %}
            <a href="?page={{ page }}">{{ page }}</a>
@@ -45,6 +45,6 @@
                {% endif %}
            </span>
     </div>
-{% endif %}
+    {% endif %}
     </body>
 </html>
