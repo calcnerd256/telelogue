@@ -1,17 +1,18 @@
 <html>
     <body>
+        <div>
 Author:
 {{ object.author }}
-<br />
+        </div>
+        <div>
 Posted at:
 {{ object.timestamp }}
-<br />
+        </div>
+        <div>
 Body of message:
 <br />
 {{ object.body|linebreaksbr }}
-<br />
-<br />
-
+        </div>
 <a href="{% url 'message_list' %}">
     Back to the log
 </a>
