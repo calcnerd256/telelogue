@@ -1,0 +1,20 @@
+{
+   "body_preview": "{{ object.get_body_preview }}",
+   "time": {
+    "timestamp": {{ object.timestamp|date:"U" }},
+    "timezone": "{{ object.timestamp|date:"O" }}"
+   },
+   "author": {% include "export/auth/user.json" with object=object.author %},
+   "authenticity": {
+    "server": {},
+    "source": {}
+   },
+   "type": "simple message",
+   "length": {{ object.get_body_codepoints|length }},
+   "unicode": [{% for point in object.get_body_codepoints %}
+    {{ point }}{% if not forloop.last %},{% endif %}{% endfor %}
+   ],
+   "hints": {
+    "id": {{ object.id }}
+   }
+  }

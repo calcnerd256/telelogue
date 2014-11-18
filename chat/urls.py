@@ -6,6 +6,7 @@ from chat.views import (
     MessageCreateView,
     MessageListView,
     MessageDetailView,
+    MessageExportView,
     UserDetailView,
 )
 
@@ -40,6 +41,13 @@ urlpatterns = patterns(
             MessageDetailView.as_view()
         ),
         name='message_detail',
+    ),
+    url(
+        r'^message/export/(?P<template>[1-90A-za-z]+)/$',
+        login_required(
+            MessageExportView.as_view()
+        ),
+        name='message_export',
     ),
 
     url(
