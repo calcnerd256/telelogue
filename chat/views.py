@@ -55,3 +55,22 @@ class UserDetailView(DetailView):
 class MessageSearchView(FormView):
     form_class = MessageSearchForm
     template_name = 'chat/message_search.html'
+
+    def __init__(self):
+        super(MessageSearchView, self).__init__()
+        self.qs = ChatMessage.objects.none()
+
+    def get(self, request, *args, **kwargs):
+        if 'search' in request.GET:
+            self.qs = ChatMessage.objects.all() # yay monkeypatching
+            substr = request.GET.get('body_substring')
+            if substr: # could be ''
+                self.qs = self.qs.filter(body__icontains=substr)
+
+            self.qs = self.qs.order_by('-timestamp')
+        return super(MessageSearchView, self).get(self, request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(MessageSearchView, self).get_context_data(**kwargs)
+        context['qs'] = self.qs
+        return context
