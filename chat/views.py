@@ -3,10 +3,12 @@ from django.views.generic import (
     CreateView,
     ListView,
     DetailView,
+    FormView,
 )
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from models import ChatMessage
+from forms import MessageSearchForm
 
 
 class ChatHomeView(TemplateView):
@@ -48,3 +50,8 @@ class UserDetailView(DetailView):
           }
         )
         return context
+
+
+class MessageSearchView(FormView):
+    form_class = MessageSearchForm
+    template_name = 'chat/message_search.html'
