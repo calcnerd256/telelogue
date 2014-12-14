@@ -8,6 +8,7 @@ from chat.views import (
     MessageDetailView,
     MessageExportView,
     UserDetailView,
+    MessageSearchView,
 )
 
 
@@ -56,5 +57,12 @@ urlpatterns = patterns(
             UserDetailView.as_view()
         ),
         name='user_detail',
+    ),
+    url(
+        r'message/search/',
+        login_required(
+            MessageSearchView.as_view()
+        ),
+        name='message_search',
     ),
 )
