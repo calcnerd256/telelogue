@@ -22,6 +22,10 @@
         <a href="{% url 'message_create' %}">
             New message
         </a>
+        <br />
+        <a href="{% url 'message_search' %}">
+            Search
+        </a>
         <form method="POST" action="{% url "message_create" %}">
             {% csrf_token %}
             <label for="body">quick message:</label>

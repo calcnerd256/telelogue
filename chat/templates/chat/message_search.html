@@ -1,0 +1,18 @@
+<h3>Message full-text search</h3>
+<p><a href="{% url 'message_list' %}">Back to the log</a></p>
+
+<form method="get">
+    {{ form.as_p }}
+    <input type="submit" name="search">
+</form>
+
+<h4>Results: {{ qs.count }}</h4>
+<ul>
+    {% for message in qs %}
+        <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id}}">
+            {{ message.body|linebreaksbr }}
+        </li>
+    {% empty %}
+        <li>There are no messages to display.</li>
+    {% endfor %}
+</ul>
