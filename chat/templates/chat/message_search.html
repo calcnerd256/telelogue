@@ -9,9 +9,7 @@
 <h4>Results: {{ qs.count }}</h4>
 <ul>
     {% for message in qs %}
-        <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id}}">
-            {{ message.body|linebreaksbr }}
-        </li>
+        {% include "chat/_message_preview.html" with object=message %}
     {% empty %}
         <li>There are no messages to display.</li>
     {% endfor %}
