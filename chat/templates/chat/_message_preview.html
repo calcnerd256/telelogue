@@ -1,8 +1,10 @@
 <li class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
     <span>
+        {% if not no_author %}
             <a href="{{ object.get_author_url }}">
                 {{ object.author }}
             </a>
+        {% endif %}
             @
             <a href="{{ object.get_absolute_url }}">
                 {{ object.timestamp }}

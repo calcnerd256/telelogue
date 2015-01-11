@@ -1,5 +1,5 @@
-<html>
-    <body>
+{% extends "chat/base.html" %}
+{% block content %}
         <div>
             User:
             {{ object.username }}
@@ -16,9 +16,7 @@
             TODO posts:
             <ul>
                 {% for message in todo_messages %}
-                    <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id}}">
-                        {{ message.body|linebreaksbr }}
-                    </li>
+        {% include "chat/_message_preview.html" with object=message no_author=True %}
                 {% endfor %}
             </ul>
         </div>
@@ -42,5 +40,4 @@
         <a href="{% url 'message_list' %}">
             Back to the log
         </a>
-    </body>
-</html>
+{% endblock %}
