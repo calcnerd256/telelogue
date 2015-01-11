@@ -1,28 +1,27 @@
-<html>
-    <head>
+{% extends "chat/base.html" %}
+{% block title %}
         <title>
             Title
         </title>
-    </head>
-    <body>
+{% endblock title %}
+{% block content %}
         <ul>
             <li>
                 <a href="{% url 'message_create' %}">
                     Say somethin'
                 </a>
             </li>
-        <br />
+            <br />
             <li>
                 <a href="{% url 'message_list' %}">
                     View the log
                 </a>
             </li>
-        <br />
+            <br />
             <li>
                 <a href="{% url "admin:index" %}">
                     administer
                 </a>
             </li>
         </ul>
-    </body>
-</html>
+{% endblock content %}

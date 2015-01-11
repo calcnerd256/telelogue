@@ -1,5 +1,5 @@
-<html>
-    <body>
+{% extends "chat/base.html" %}
+{% block content %}
         <div>
             Author:
             <a href="{{ object.get_author_url }}">
@@ -18,5 +18,4 @@
         <a href="{% url 'message_list' %}">
             Back to the log
         </a>
-    </body>
-</html>
+{% endblock content %}
