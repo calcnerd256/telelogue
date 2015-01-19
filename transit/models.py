@@ -16,4 +16,4 @@ class Triple(models.Model):
         if author is not NotImplemented:
             triples = triples.filter(author=author)
         if not triples: return None
-        return triples[0]
+        return triples[0].destination
