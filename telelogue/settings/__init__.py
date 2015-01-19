@@ -150,6 +150,7 @@ INSTALLED_APPS = (
 
     # Our apps
     "chat",
+    "transit",
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
