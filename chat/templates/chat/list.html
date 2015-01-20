@@ -1,0 +1,29 @@
+{% extends "chat/base.html" %}
+{% block content %}
+    {{ block.super }}
+    {% block before_list %}
+    {% endblock before_list %}
+    {% block list %}
+        <ul>
+            {% for object in object_list %}
+                {% block item %}
+                    <li>
+                        {% with url=object.get_absolute_url %}
+                            {% if url %}
+                                <a href="{{ url }}">
+                            {% endif %}
+                                    {{ object }}
+                            {% if url %}
+                                </a>
+                            {% endif %}
+                        {% endwith %}
+                    </li>
+                {% endblock item %}
+            {% endfor %}
+        </ul>
+    {% endblock list %}
+    {% block after_list %}
+        {% block pagination %}
+        {% endblock pagination %}
+    {% endblock after_list %}
+{% endblock content %}

@@ -1,5 +1,4 @@
-{% extends "chat/base.html" %}
-{% block content %}
+{% extends "chat/list.html" %}
     {% block before_list %}
         <a href="{% url 'message_create' %}">
             New message
@@ -15,14 +14,12 @@
             <input type="submit" value="say it"></input>
         </form>
     {% endblock before_list %}
-    {% block list %}
-        <ul>
-            {% for message in object_list %}
-                {% include "chat/_message_preview.html" with object=message %}
-            {% endfor %}
-        </ul>
-    {% endblock list %}
-    {% block after_list %}
+
+{% block item %}
+    {% include "chat/_message_preview.html" %}
+{% endblock item %}
+
+{% block pagination %}
         {% if is_paginated %}
 
             {% for page in page_obj.paginator.page_range %}
@@ -51,5 +48,4 @@
                 </span>
             </div>
         {% endif %}
-    {% endblock after_list %}
-{% endblock content %}
+{% endblock pagination %}
