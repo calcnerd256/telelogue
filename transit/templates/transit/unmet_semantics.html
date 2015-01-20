@@ -13,3 +13,12 @@
         {% endfor %}
     </dl>
 {% endblock before_list %}
+
+{% block item %}
+    {{ block.super }}
+    Is it any of these?
+    {% for candidate in semantic_fringe %}
+        <a href="{% url "create_from_three_messages" candidate.source.value.pk candidate.path.value.pk object.pk %}">
+            {{ candidate.name }}</a>
+    {% endfor %}
+{% endblock item %}
