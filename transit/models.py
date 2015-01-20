@@ -74,3 +74,16 @@ class Triple(models.Model):
         if n == len(cache): cache.append(previous)
         result = cls.lookup(successor, previous)
         return result
+
+    @classmethod
+    def set_semantic(cls, name, destination, commit=True):
+        # definitely a bootstrapping helper and nothing more
+        semantics = lookup_semantics[name] # fail loudly: assume name in dict
+        sn, pn = semantics # fail loudly: assume not already cached
+        source = cls.lookup_semantic(sn)
+        if source is None and sn is not None: return None
+        path = cls.lookup_semantic(pn)
+        if path is None and pn is not None: return None
+        result = cls(source=source, path=path, destination=destination)
+        if commit: result.save()
+        return result
