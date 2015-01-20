@@ -1,5 +1,5 @@
 {% extends "chat/list.html" %}
-    {% block before_list %}
+{% block before_list %}
         <a href="{% url 'message_create' %}">
             New message
         </a>
@@ -13,39 +13,8 @@
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
             <input type="submit" value="say it"></input>
         </form>
-    {% endblock before_list %}
+{% endblock before_list %}
 
 {% block item %}
     {% include "chat/_message_preview.html" %}
 {% endblock item %}
-
-{% block pagination %}
-        {% if is_paginated %}
-
-            {% for page in page_obj.paginator.page_range %}
-                <a href="?page={{ page }}">
-                    {{ page }}
-                </a>
-            {% endfor %}
-            <div class="pagination">
-                <span class="page-links">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}">
-                            &larr;
-                        </a>
-                    {% endif %}
-                    <span class="page-current">
-                        Page
-                        {{ page_obj.number }}
-                        of
-                        {{ page_obj.paginator.num_pages }}.
-                    </span>
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}">
-                            &rarr;
-                        </a>
-                    {% endif %}
-                </span>
-            </div>
-        {% endif %}
-{% endblock pagination %}
