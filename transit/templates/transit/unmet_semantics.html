@@ -1,0 +1,15 @@
+{% extends "chat/base.html" %}
+{% block content %}
+    <dl>
+        {% for object in object_list %}
+            <dt>{{ object.name }}</dt>
+            <dd>
+                <a href="{{ object.source.value.get_absolute_url }}">
+                    {{ object.source.name }}</a>
+                <a href="{{ object.path.value.get_absolute_url }}">
+                    {{ object.path.name }}
+                </a>
+            </dd>
+        {% endfor %}
+    </dl>
+{% endblock content %}
