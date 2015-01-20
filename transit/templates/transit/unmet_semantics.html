@@ -1,7 +1,7 @@
-{% extends "chat/base.html" %}
-{% block content %}
+{% extends "chat/chatmessage_list.html" %}
+{% block before_list %}
     <dl>
-        {% for object in object_list %}
+        {% for object in semantic_fringe %}
             <dt>{{ object.name }}</dt>
             <dd>
                 <a href="{{ object.source.value.get_absolute_url }}">
@@ -12,4 +12,4 @@
             </dd>
         {% endfor %}
     </dl>
-{% endblock content %}
+{% endblock before_list %}
