@@ -1,0 +1,22 @@
+{% extends "chat/chatmessage_list.html" %}
+{% block before_list %}
+    <h2>Tags:</h2>
+    <ol>
+        {% for tag in tags %}
+            {% include "chat/_message_preview.html" with object=tag %}
+        {% endfor %}
+    </ol>
+    <h2>Untagged messages:</h2>
+{% endblock before_list %}
+{% block item %}
+    {{ block.super }}
+    tag as:
+    <ol>
+        {% for tag in tags %}
+            <a href="{% url "create_from_three_messages" tag_tag.pk object.pk tag.pk %}">
+                {{ tag.pk }}
+            </a>
+            {% include "chat/_message_preview.html" with object=tag %}
+        {% endfor %}
+    </ol>
+{% endblock item %}

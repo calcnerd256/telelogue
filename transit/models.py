@@ -105,3 +105,11 @@ class Triple(models.Model):
         result = cls(source=source, path=path, destination=destination)
         if commit: result.save()
         return result
+
+    @classmethod
+    def get_tags(cls):
+        tag = cls.lookup_semantic("tag")
+        if tag is None: return None
+        trips = cls.objects.filter(source=tag, destination=tag)
+        result = [t.path for t in trips if cls.lookup(tag, t.path) == tag]
+        return result

@@ -1,5 +1,4 @@
-# Create your views here.
-
+from django.db.models import Q
 from django.views.generic import (
     CreateView,
 )
@@ -17,6 +16,7 @@ from .models import (
 )
 from chat.models import ChatMessage
 from chat.views import MessageListView
+
 
 def cache_getter(name):
     def decorator(fn):
@@ -111,4 +111,25 @@ class UnmetSemanticsView(MessageListView):
     def get_context_data(self, *args, **kwargs):
         context = super(UnmetSemanticsView, self).get_context_data(*args, **kwargs)
         context["semantic_fringe"] = self.get_candidates()
+        return context
+
+
+class UntaggedMessagesView(MessageListView):
+    template_name="transit/untagged_messages.html"
+    def get_queryset(self):
+        qs = super(UntaggedMessagesView, self).get_queryset()
+        tag = Triple.lookup_semantic("tag")
+        if tag is None: return qs
+        tags = Triple.get_tags()
+        taggings = Triple.objects.filter(source=tag)
+        tagged = taggings.values("path")
+        tag_removed = taggings.filter(destination=None).values("path")
+        query = Q(pk__in=tag_removed)|~Q(pk__in=tagged)
+        candidates = qs.filter(query)
+        return candidates.order_by("timestamp")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(UntaggedMessagesView, self).get_context_data(*args, **kwargs)
+        context["tags"] = Triple.get_tags()
+        context["tag_tag"] = Triple.lookup_semantic("tag")
         return context
