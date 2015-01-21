@@ -5,6 +5,7 @@ from .views import (
     UnmetSemanticsView,
     CreateFromThreeMessagesView,
     UntaggedMessagesView,
+    TaggedMessagesView,
 )
 
 admin.autodiscover()
@@ -31,5 +32,12 @@ urlpatterns = patterns(
             UntaggedMessagesView.as_view()
         ),
         name="untagged_messages",
+    ),
+    url(
+        r'^message/tag/(?P<pk>\d+)/$',
+        login_required(
+            TaggedMessagesView.as_view()
+        ),
+        name="tagged_messages"
     ),
 )

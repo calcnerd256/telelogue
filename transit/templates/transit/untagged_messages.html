@@ -3,6 +3,7 @@
     <h2>Tags:</h2>
     <ol>
         {% for tag in tags %}
+            <a href="{% url "tagged_messages" tag.pk %}">{{ tag.pk }}</a>
             {% include "chat/_message_preview.html" with object=tag %}
         {% endfor %}
     </ol>
