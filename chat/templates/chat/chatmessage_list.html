@@ -1,11 +1,11 @@
 {% extends "chat/list.html" %}
 {% block before_list %}
-        <a href="{% url 'message_create' %}">
-            New message
+        <a href="{% url 'home' %}">
+            Home
         </a>
         <br />
-        <a href="{% url 'message_search' %}">
-            Search
+        <a href="{% url 'message_create' %}">
+            New message
         </a>
         <form method="POST" action="{% url "message_create" %}">
             {% csrf_token %}
