@@ -19,7 +19,9 @@ class MessageCreateView(CreateView):
     model = ChatMessage
 
     def get_success_url(self):
-        return reverse('message_list')
+        url = self.request.GET.get("next")
+        if url is not None: return url
+        return super(CreateView, self).get_success_url()
 
 
 class MessageListView(ListView):

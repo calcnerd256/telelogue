@@ -7,11 +7,10 @@
         <a href="{% url 'message_create' %}">
             New message
         </a>
-        <form method="POST" action="{% url "message_create" %}">
+        <form method="POST" action="{% url "message_create" %}?next={% url "message_list" %}">
             {% csrf_token %}
             <label for="body">quick message:</label>
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
-            <input type="hidden" name="redirect" value="{% url "today" %}"></input>
             <input type="submit" value="say it"></input>
         </form>
 {% endblock before_list %}
