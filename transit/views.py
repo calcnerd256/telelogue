@@ -1,7 +1,12 @@
+# python imports
+import datetime
+
+# django imports
 from django.db.models import Q
 from django.views.generic import (
     CreateView,
     DetailView,
+    ListView,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -11,6 +16,9 @@ from django.core.urlresolvers import (
    reverse_lazy,
 )
 
+# third-party app imports
+
+# local app imports
 from .models import (
     lookup_semantics,
     Triple,
@@ -150,3 +158,21 @@ class TaggedMessagesView(DetailView):
         context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
         context["object_list"] = self.get_tagged_messages()
         return context
+
+
+class TodayView(ListView):
+    model = ChatMessage
+    template_name = "transit/today.html"
+
+    def get_sticky_messages(self):
+        # TODO: make a mutable set for this
+        return None
+
+    def get_queryset(self):
+        qs = super(TodayView, self).get_queryset()
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(1)
+        yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
+        result = qs.filter(timestamp__gte=yesterday_midnight)
+        # TODO: filter by transit rules
+        return result.order_by("-timestamp")

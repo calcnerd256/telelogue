@@ -1,0 +1,21 @@
+{% extends "chat/list.html" %}
+{% block before_list %}
+    {{ block.super }}
+    <a href="{% url "home" %}">
+        Home
+    </a>
+    <br />
+    <a href="{% url "message_create" %}">
+        New message</a>
+    (plain)
+    <br />
+    <form method="POST" action="{% url "message_create" %}">
+        {% csrf_token %}
+        <label for="body">Quick (plain) message:</label>
+        <input type="text" name="body" autofocus="html5"></input>
+        <input type="submit" value="plain"></input>
+    </form>
+{% endblock before_list %}
+{% block item %}
+    {% include "chat/_message_preview.html" %}
+{% endblock item %}

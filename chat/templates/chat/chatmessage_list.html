@@ -11,6 +11,7 @@
             {% csrf_token %}
             <label for="body">quick message:</label>
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
+            <input type="hidden" name="redirect" value="{% url "today" %}"></input>
             <input type="submit" value="say it"></input>
         </form>
 {% endblock before_list %}
