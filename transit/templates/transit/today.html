@@ -5,16 +5,25 @@
         Home
     </a>
     <br />
-    <a href="{% url "message_create" %}">
-        New message</a>
-    (plain)
-    <br />
+    <h3>most recent</h3>
     <form method="POST" action="{% url "message_create" %}?next={% url "today" %}">
         {% csrf_token %}
         <label for="body">Quick (plain) message:</label>
         <input type="text" name="body" autofocus="html5"></input>
         <input type="submit" value="plain"></input>
     </form>
+    <br />
+    {% include "transit/_message_preview.html" with object=object_list|first %}
+    <h3>sticky</h3>
+    <ul>
+        {% for object in sticky_posts %}
+            {% include "transit/_message_preview.html" %}
+        {% endfor %}
+    </ul>
+    <h3>today's messages</h3>
+    <a href="{% url "message_create" %}">
+        New message</a>
+    (plain)
 {% endblock before_list %}
 {% block item %}
   {% if not object.hide %}

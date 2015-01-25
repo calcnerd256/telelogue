@@ -170,14 +170,21 @@ class TodayView(ListView):
     template_name = "transit/today.html"
 
     def get_sticky_messages(self):
-        # TODO: make a mutable set for this
-        return None
+        sticky = Triple.lookup_semantic("sticky")
+        if sticky is None:
+            return None
+        stickings = sticky.source_set.all()
+        stickers = (edge.path for edge in stickings if edge.current_value is not None)
+        result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
+        return result.order_by("timestamp")
 
     def enhance_message(self, message):
-        # TODO: filter by transit rules
         hidden = Triple.lookup_semantic("hide")
         if hidden is not None:
             message.hide = Triple.lookup(hidden, message)
+        sticky = Triple.lookup_semantic("sticky")
+        if sticky is not None:
+            message.sticky = Triple.lookup(sticky, message)
         return message
 
     def get_queryset(self):
@@ -195,4 +202,9 @@ class TodayView(ListView):
         hidden = Triple.lookup_semantic("hide")
         context["hide_pk"] = hidden.pk if hidden else None
         context["this_page"] = self.request.path
+        stick = Triple.lookup_semantic("sticky")
+        context["sticky_pk"] = stick.pk if stick else None
+        context["sticky_posts"] = (self.enhance_message(post) for post in self.get_sticky_messages())
+        # force the generator so that I can reuse its results
+        context["object_list"] = list(context["object_list"])
         return context

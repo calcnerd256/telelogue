@@ -34,6 +34,10 @@ lookup_semantics = {
     "featurebag": ("telelogue", "one"),
     "tag": ("featurebag", "one"),
     "hide": ("featurebag", "two"),
+    "three": ("successor", "two"),
+    "reply": ("featurebag", "three"),
+    "four": ("successor", "three"),
+    "sticky": ("featurebag", "four"),
 }
 
 class Triple(models.Model):
@@ -116,5 +120,5 @@ class Triple(models.Model):
         return result
 
 
-    def current_value(self):
-        return self.lookup(self.source, self.path)
+    def current_value(self, author=NotImplemented):
+        return self.lookup(self.source, self.path, author)
