@@ -42,6 +42,11 @@ class CreateFromThreeMessagesView(CreateView):
     template_name = "transit/triple/create/from_messages.html"
     success_url = reverse_lazy("untagged_messages")
 
+    def get_success_url(self):
+        url = self.request.GET.get("next")
+        if url is not None: return url
+        return super(CreateFromThreeMessagesView, self).get_success_url()
+
     @cache_getter("source")
     def get_source(self):
         pk = self.kwargs["source"]
@@ -170,6 +175,9 @@ class TodayView(ListView):
 
     def enhance_message(self, message):
         # TODO: filter by transit rules
+        hidden = Triple.lookup_semantic("hide")
+        if hidden is not None:
+            message.hide = Triple.lookup(hidden, message)
         return message
 
     def get_queryset(self):
@@ -181,3 +189,10 @@ class TodayView(ListView):
         result = result.order_by("-timestamp")
         result = (self.enhance_message(message) for message in result)
         return result
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TodayView, self).get_context_data(*args, **kwargs)
+        hidden = Triple.lookup_semantic("hide")
+        context["hide_pk"] = hidden.pk if hidden else None
+        context["this_page"] = self.request.path
+        return context

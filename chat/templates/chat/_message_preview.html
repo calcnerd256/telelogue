@@ -1,14 +1,14 @@
 <li class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
     <span>
+      {% block metadata %}
         {% if not no_author %}
             <a href="{{ object.get_author_url }}">
-                {{ object.author }}
-            </a>
+                {{ object.author }}</a>
         {% endif %}
             @
             <a href="{{ object.get_absolute_url }}">
-                {{ object.timestamp }}
-            </a>
+                {{ object.timestamp }}</a>
+      {% endblock metadata %}
     </span>
     <p>
         {{ object.body|linebreaksbr }}

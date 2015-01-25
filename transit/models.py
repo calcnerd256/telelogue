@@ -33,12 +33,13 @@ lookup_semantics = {
     "telelogue": ("process", "one"),
     "featurebag": ("telelogue", "one"),
     "tag": ("featurebag", "one"),
+    "hide": ("featurebag", "two"),
 }
 
 class Triple(models.Model):
-    source = models.ForeignKey(ChatMessage, related_name="source_set", null=True)
-    path = models.ForeignKey(ChatMessage, related_name="path_set", null=True)
-    destination = models.ForeignKey(ChatMessage, related_name="destination_set", null=True)
+    source = models.ForeignKey(ChatMessage, related_name="source_set", null=True, blank=True)
+    path = models.ForeignKey(ChatMessage, related_name="path_set", null=True, blank=True)
+    destination = models.ForeignKey(ChatMessage, related_name="destination_set", null=True, blank=True)
     author = CurrentUserField(add_only=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -113,3 +114,7 @@ class Triple(models.Model):
         trips = cls.objects.filter(source=tag, destination=tag)
         result = [t.path for t in trips if cls.lookup(tag, t.path) == tag]
         return result
+
+
+    def current_value(self):
+        return self.lookup(self.source, self.path)

@@ -1,0 +1,7 @@
+{% extends "chat/_message_preview.html" %}
+{% block metadata %}
+    {{ block.super }}
+    {% if hide_pk %}
+        (<a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">hide</a>)
+    {% endif %}
+{% endblock metadata %}
