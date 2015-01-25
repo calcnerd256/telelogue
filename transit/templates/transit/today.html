@@ -12,8 +12,10 @@
         <input type="text" name="body" autofocus="html5"></input>
         <input type="submit" value="plain"></input>
     </form>
-    <br />
-    {% include "transit/_message_preview.html" with object=object_list|first %}
+    <ol>
+        {% include "transit/_message_preview.html" with object=object_list|first %}
+        {% include "transit/_message_preview.html" with object=object_list.1 %}
+    </ol>
     <h3>sticky</h3>
     <ul>
         {% for object in sticky_posts %}

@@ -1,10 +1,10 @@
 {% extends "chat/_message_preview.html" %}
 {% block metadata %}
     {{ block.super }}
-    {% if hide_pk %}
+    {% if hide_pk and object.pk %}
         (<a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">hide</a>)
     {% endif %}
-    {% if sticky_pk %}
+    {% if sticky_pk and object.pk %}
         {% if object.sticky %}
             sticky
             (<a href="{% url "create_from_three_messages" sticky_pk object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">unstick</a>)
