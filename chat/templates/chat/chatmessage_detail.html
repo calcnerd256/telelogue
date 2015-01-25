@@ -1,5 +1,8 @@
 {% extends "chat/base.html" %}
 {% block content %}
+        <a href="{% url 'home' %}">
+            Home
+        </a>
         <div>
             Author:
             <a href="{{ object.get_author_url }}">
@@ -15,7 +18,4 @@
             <br />
 <pre>{{ object.body|urlize }}</pre>
         </div>
-        <a href="{% url 'message_list' %}">
-            Back to the log
-        </a>
 {% endblock content %}

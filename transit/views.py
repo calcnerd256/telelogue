@@ -168,11 +168,16 @@ class TodayView(ListView):
         # TODO: make a mutable set for this
         return None
 
+    def enhance_message(self, message):
+        # TODO: filter by transit rules
+        return message
+
     def get_queryset(self):
         qs = super(TodayView, self).get_queryset()
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(1)
         yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
         result = qs.filter(timestamp__gte=yesterday_midnight)
-        # TODO: filter by transit rules
-        return result.order_by("-timestamp")
+        result = result.order_by("-timestamp")
+        result = (self.enhance_message(message) for message in result)
+        return result
