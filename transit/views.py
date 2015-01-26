@@ -174,7 +174,7 @@ class TodayView(ListView):
         if sticky is None:
             return None
         stickings = sticky.source_set.all()
-        stickers = (edge.path for edge in stickings if edge.current_value is not None)
+        stickers = (edge.path for edge in stickings if edge.current_value() is not None)
         result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
         return result.order_by("timestamp")
 
