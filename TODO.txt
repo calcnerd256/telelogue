@@ -1,6 +1,7 @@
 Definitely, and soon
 --------------------
 Login screen
+Extract a template fragment for a chat message "preview" (a styled thing like in the list view)
 
 Big features
 ------------
