@@ -7,6 +7,7 @@ from .views import (
     CreateFromThreeMessagesView,
     UntaggedMessagesView,
     TaggedMessagesView,
+    ChatMessageDetailView,
 )
 
 admin.autodiscover()
@@ -47,5 +48,12 @@ urlpatterns = patterns(
             TaggedMessagesView.as_view()
         ),
         name="tagged_messages"
+    ),
+    url(
+        r'^message/(?P<pk>\d+)/detail/$',
+        login_required(
+            ChatMessageDetailView.as_view()
+        ),
+        name="transit_message_detail"
     ),
 )

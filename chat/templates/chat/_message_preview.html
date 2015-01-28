@@ -2,12 +2,16 @@
     <span>
       {% block metadata %}
         {% if not no_author %}
+          {% block author %}
             <a href="{{ object.get_author_url }}">
                 {{ object.author }}</a>
+          {% endblock author %}
         {% endif %}
             @
+            {% block detail_link %}
             <a href="{{ object.get_absolute_url }}">
                 {{ object.timestamp }}</a>
+            {% endblock detail_link %}
       {% endblock metadata %}
     </span>
     <p>

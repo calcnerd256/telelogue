@@ -208,3 +208,11 @@ class TodayView(ListView):
         # force the generator so that I can reuse its results
         context["object_list"] = list(context["object_list"])
         return context
+
+class ChatMessageDetailView(DetailView):
+    model = ChatMessage
+    template_name = "transit/message_detail.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ChatMessageDetailView, self).get_context_data(*args, **kwargs)
+        return context
