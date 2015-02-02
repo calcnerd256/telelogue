@@ -38,6 +38,8 @@ lookup_semantics = {
     "reply": ("featurebag", "three"),
     "four": ("successor", "three"),
     "sticky": ("featurebag", "four"),
+    "five": ("successor", "four"),
+    "reply tag": ("featurebag", "five"),
 }
 
 class Triple(models.Model):

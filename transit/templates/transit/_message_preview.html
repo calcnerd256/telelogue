@@ -19,4 +19,9 @@
             (<a href="{% url "create_from_three_messages" sticky_pk object.pk object.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">pin</a>)
         {% endif %}
     {% endif %}
+    {% if object.tag.pk %}
+        tag:
+        <a href="{% url "tagged_messages" object.tag.pk %}">
+            {{ object.tag.get_body_preview }}</a>
+    {% endif %}
 {% endblock metadata %}
