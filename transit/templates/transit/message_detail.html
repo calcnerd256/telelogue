@@ -1,6 +1,11 @@
 {% extends "chat/chatmessage_detail.html" %}
 {% block content %}
     {{ block.super }}
+    <a href="{% url "transit_message_detail" object.pk|add:-1 %}">
+        {{ object.pk|add:-1 }}&larr;</a>
+    {{ object.pk }}
+    <a href="{% url "transit_message_detail" object.pk|add:1 %}">
+        &rarr;{{ object.pk|add:1 }}</a>
     <h2>
         participates in edges
     </h2>

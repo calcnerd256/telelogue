@@ -26,6 +26,8 @@ from .models import (
 from chat.models import ChatMessage
 from chat.views import MessageListView
 
+# this app's imports
+
 
 def cache_getter(name):
     def decorator(fn):
