@@ -8,6 +8,9 @@
 {% endblock detail_link %}
 {% block metadata %}
     {{ block.super }}
+    {% if object.pk %}
+        (<a href="{% url "reply" object.pk %}">reply</a>)
+    {% endif %}
     {% if hide_pk and object.pk %}
         (<a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">hide</a>)
     {% endif %}
@@ -23,5 +26,10 @@
         tag:
         <a href="{% url "tagged_messages" object.tag.pk %}">
             {{ object.tag.get_body_preview }}</a>
+    {% endif %}
+    {% if object.parent.pk %}
+        in reply to
+        <a href="{% url "reply" object.parent.pk %}">
+            {{ object.parent.get_body_preview }}</a>
     {% endif %}
 {% endblock metadata %}

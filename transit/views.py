@@ -189,9 +189,21 @@ class TodayView(ListView):
         if sticky is not None:
             message.sticky = Triple.lookup(sticky, message)
 
+        reply = Triple.lookup_semantic("reply")
+        if reply is not None:
+            message.parent = Triple.lookup(reply, message)
+
         tag = Triple.lookup_semantic("tag")
         if tag is not None:
             message.tag = Triple.lookup(tag, message)
+            reply_tag = Triple.lookup_semantic("reply tag")
+            if reply_tag is not None and message.tag is not None:
+                if reply_tag.pk == message.tag.pk:
+                    if message.parent:
+                        message.tag = {
+                            "pk": message.tag.pk,
+                            "get_body_preview": "a reply",
+                        }
 
         return message
 
