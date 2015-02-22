@@ -44,7 +44,7 @@ urlpatterns = patterns(
         name='message_detail',
     ),
     url(
-        r'^message/export/(?P<template>[1-90A-za-z]+)/$',
+        r'^message/export/(?P<template>[1-90A-Za-z]+)/$',
         login_required(
             MessageExportView.as_view()
         ),
