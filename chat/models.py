@@ -15,11 +15,15 @@ class ChatMessageExportMixin(object):
 
     def get_body_preview(self):
         #ASCII-safe
-        h = self.get_body_codepoints()
-        if not h: return h
-        hexpoints = h
+        points = self.get_body_codepoints()
+        if not points: return points
         whitelist = [ord(c) for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
-        safepoints = [p for p in hexpoints if p < 256 and p in whitelist]
+        safepoints = [
+            p
+            for p
+            in points
+            if p < 256 and p in whitelist
+        ]
         return "".join([chr(c) for c in safepoints])[:64]
 
 
