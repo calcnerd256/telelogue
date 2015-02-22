@@ -1,26 +1,26 @@
 {% extends "chat/base.html" %}
 {% block content %}
-        <div>
+    <div>
             User:
             {{ object.username }}
-        </div>
-        <div>
+    </div>
+    <div>
             Ideas for stuff to put here:
             <ul>
                 <li>
                     All the tags this user has used so far
                 </li>
             </ul>
-        </div>
-        <div>
-            TODO posts:
-            <ul>
-                {% for message in todo_messages %}
-        {% include "chat/_message_preview.html" with object=message no_author=True %}
-                {% endfor %}
-            </ul>
-        </div>
-        <div>
+    </div>
+    <div>
+        TODO posts:
+        <ul>
+            {% for object in todo_messages %}
+                {% include "chat/_message_preview.html" with no_author=True wrapper_element="li" %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
             Stats:
             <ul>
                 <li>
@@ -36,8 +36,8 @@
                     {{ HGWILY_count }}
                 </li>
             </ul>
-        </div>
-        <a href="{% url 'message_list' %}">
-            Back to the log
-        </a>
-{% endblock %}
+    </div>
+<a href="{% url 'message_list' %}">
+    Back to the log
+</a>
+{% endblock content %}
