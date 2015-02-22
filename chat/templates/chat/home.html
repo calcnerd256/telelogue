@@ -1,10 +1,10 @@
-<html>
-    <head>
+{% extends "chat/base.html" %}
+{% block title %}
         <title>
             Title
         </title>
-    </head>
-    <body>
+{% endblock title %}
+{% block content %}
         <a href="{% url 'message_create' %}">
             Say somethin'
         </a>
@@ -16,5 +16,4 @@
         <a href="{% url "admin:index" %}">
             administer
         </a>
-    </body>
-</html>
+{% endblock content %}
