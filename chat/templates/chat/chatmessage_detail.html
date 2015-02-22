@@ -1,19 +1,19 @@
 {% extends "chat/base.html" %}
 {% block content %}
-        <a href="{% url 'home' %}">
-            Home
-        </a>
-        <div>
+    <a href="{% url 'home' %}">
+        Home
+    </a>
+    <div>
             Author:
             <a href="{{ object.get_author_url }}">
                 {{ object.author }}
             </a>
-        </div>
-        <div>
+    </div>
+    <div>
             Posted at:
             {{ object.timestamp }}
-        </div>
-        <div>
+    </div>
+    <div>
             Body of message:
             <br />
 <pre>{{ object.body|urlize }}</pre>
