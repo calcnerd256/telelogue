@@ -1,4 +1,10 @@
 {% extends "chat/base.html" %}
 {% block content %}
     {{ block.super }}
+    {% block before_list %}
+    {% endblock before_list %}
+    {% block list %}
+    {% endblock list %}
+    {% block after_list %}
+    {% endblock after_list %}
 {% endblock content %}

@@ -1,5 +1,5 @@
 {% extends "chat/list.html" %}
-{% block content %}
+{% block before_list %}
         <a href="{% url 'message_create' %}">
             New message
         </a>
@@ -13,6 +13,8 @@
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
             <input type="submit" value="say it"></input>
         </form>
+{% endblock before_list %}
+{% block list %}
         {% for message in object_list %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 <span>
@@ -29,6 +31,8 @@
                 </p>
             </li>
         {% endfor %}
+{% endblock list %}
+{% block after_list %}
         {% if is_paginated %}
 
             {% for page in page_obj.paginator.page_range %}
@@ -57,4 +61,4 @@
                 </span>
             </div>
         {% endif %}
-{% endblock content %}
+{% endblock after_list %}
