@@ -34,6 +34,11 @@ class MessageListView(ListView):
 class MessageDetailView(DetailView):
     model = ChatMessage
 
+class MessageExportView(ListView):
+    model = ChatMessage
+    paginate_by = 64
+    template_name = "chat/chatmessage_list.html"
+
 
 class UserDetailView(DetailView):
     model = User
