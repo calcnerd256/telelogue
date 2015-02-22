@@ -1,3 +1,5 @@
+{% extends "chat/base.html" %}
+{% block content %}
 <h3>Message full-text search</h3>
 <p><a href="{% url 'message_list' %}">Back to the log</a></p>
 
@@ -16,3 +18,4 @@
         <li>There are no messages to display.</li>
     {% endfor %}
 </ul>
+{% endblock content %}
