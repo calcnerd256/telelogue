@@ -1,0 +1,21 @@
+{
+ "about": {
+  "title": "telelogue",
+  "TODO": [
+  ]
+ },{% if is_paginated %}
+ "pagination": {
+  "page": {{ page_obj.number }},
+  "number of pages": {{ page_obj.paginator.num_pages }}
+ },{% endif %}
+ "messages": [
+  {% for object in object_list %}{% comment %}
+{% endcomment %}{% include "export/chat/chatmessage_detail.json" %}{% comment %}
+{% endcomment %}{% if not forloop.last %},
+  {% endif %}{% endfor %}
+ ],
+ "server": {
+  "TODO": [
+  ]
+ }
+}
