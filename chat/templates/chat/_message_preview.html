@@ -1,20 +1,20 @@
-<li class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
+<{{ wrapper_element|default:"li"}} class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
     <span>
-      {% block metadata %}
-        {% if not no_author %}
-          {% block author %}
-            <a href="{{ object.get_author_url }}">
-                {{ object.author }}</a>
-          {% endblock author %}
-        {% endif %}
+        {% block metadata %}
+            {% if not no_author %}
+                {% block author %}
+                    <a href="{{ object.get_author_url }}">
+                        {{ object.author }}</a>
+                {% endblock author %}
+            {% endif %}
             @
             {% block detail_link %}
-            <a href="{{ object.get_absolute_url }}">
-                {{ object.timestamp }}</a>
+                <a href="{{ object.get_absolute_url }}">
+                    {{ object.timestamp }}</a>
             {% endblock detail_link %}
-      {% endblock metadata %}
+        {% endblock metadata %}
     </span>
     <p>
         {{ object.body|linebreaksbr }}
     </p>
-</li>
+</{{ wrapper_element|default:"li"}}>

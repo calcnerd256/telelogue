@@ -10,8 +10,8 @@
 
 <h4>Results: {{ qs.count }}</h4>
 <ul>
-    {% for message in qs %}
-        {% include "chat/_message_preview.html" with object=message %}
+    {% for object in qs %}
+        {% include "chat/_message_preview.html" with wrapper_element="li" %}
     {% empty %}
         <li>There are no messages to display.</li>
     {% endfor %}

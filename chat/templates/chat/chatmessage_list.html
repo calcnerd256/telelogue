@@ -15,5 +15,5 @@
         </form>
 {% endblock before_list %}
 {% block item %}
-    {% include "chat/_message_preview.html" %}
+    {% include "chat/_message_preview.html" with wrapper_element="li" %}
 {% endblock item %}
