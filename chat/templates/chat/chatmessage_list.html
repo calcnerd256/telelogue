@@ -7,7 +7,7 @@
         <a href="{% url 'message_search' %}">
             Search
         </a>
-        <form method="POST" action="{% url "message_create" %}">
+        <form method="POST" action="{% url "message_create" %}?next={% url "message_list" %}">
             {% csrf_token %}
             <label for="body">quick message:</label>
             <input type="text" name="body" autofocus="yes, please" tabindex="1"></input>
