@@ -1,7 +1,8 @@
 {{ object_list }}
 <ul>
     {% for object in object_list %}
-    <li>
-        {{ object }}
-    </li>
+        <li>
+            {{ object }}
+        </li>
+    {% endfor %}
 </ul>
