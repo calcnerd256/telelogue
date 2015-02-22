@@ -1,24 +1,5 @@
-<html>
-    <head>
-        <style>
-            li.ChatMessage{
-                border: 1px solid black;
-                border-radius: 10px;
-            }
-            li.ChatMessage.me{
-                opacity: 0.5;
-            }
-            li.ChatMessage.user_1{
-                /* calcnerd256 */
-                background: #80c0ff;
-            }
-            li.ChatMessage.user_2{
-                /* zhera */
-                background: #80ff80;
-            }
-        </style>
-    </head>
-    <body>
+{% extends "chat/base.html" %}
+{% block content %}
         <a href="{% url 'message_create' %}">
             New message
         </a>
@@ -76,5 +57,4 @@
                 </span>
             </div>
         {% endif %}
-    </body>
-</html>
+{% endblock content %}
