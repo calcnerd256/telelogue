@@ -2,8 +2,11 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from cuser.fields import CurrentUserField
 
+
 class ChatMessageExportMixin(object):
-    pass
+    def get_body_preview(self):
+        pass
+
 
 class ChatMessage(ChatMessageExportMixin, models.Model):
     body = models.TextField(blank=True)
