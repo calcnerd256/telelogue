@@ -2,8 +2,10 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from cuser.fields import CurrentUserField
 
+class ChatMessageExportMixin(object):
+    pass
 
-class ChatMessage(models.Model):
+class ChatMessage(ChatMessageExportMixin, models.Model):
     body = models.TextField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     author = CurrentUserField(add_only=True)
