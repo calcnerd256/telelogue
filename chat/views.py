@@ -36,6 +36,16 @@ class MessageListView(ListView):
 class MessageDetailView(DetailView):
     model = ChatMessage
 
+class MessageExportView(ListView):
+    model = ChatMessage
+    paginate_by = 64
+    template_name = "chat/chatmessage_list.html"
+    def get_template_names(self):
+        fallbacks = super(MessageExportView, self).get_template_names()
+        requested_name = self.kwargs.get("template", "default")
+        result = ["export/chat/chatmessage_list.%s" % requested_name]
+        return result + fallbacks
+
 
 class UserDetailView(DetailView):
     model = User
