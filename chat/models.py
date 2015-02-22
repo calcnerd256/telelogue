@@ -5,7 +5,8 @@ from cuser.fields import CurrentUserField
 
 class ChatMessageExportMixin(object):
     def get_body_codepoints(self):
-        pass
+        u = unicode(self.body)
+        return [ord(point) for point in u]
 
     def get_body_preview(self):
         pass
