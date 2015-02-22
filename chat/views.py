@@ -21,7 +21,7 @@ class MessageCreateView(CreateView):
     def get_success_url(self):
         url = self.request.GET.get("next")
         if url is not None: return url
-        return super(CreateView, self).get_success_url()
+        return super(MessageCreateView, self).get_success_url()
 
 
 class MessageListView(ListView):
