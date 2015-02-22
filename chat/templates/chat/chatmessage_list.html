@@ -14,8 +14,8 @@
             <input type="submit" value="say it"></input>
         </form>
 {% endblock before_list %}
-{% block list %}
-        {% for message in object_list %}
+{% block item %}
+    {% with message=object %}
             <li class="ChatMessage {% if user.id == message.author.id %}me {% endif %}user_{{ message.author.id }}">
                 <span>
                         <a href="{{ message.get_author_url }}">
@@ -30,35 +30,5 @@
                     {{ message.body|linebreaksbr }}
                 </p>
             </li>
-        {% endfor %}
-{% endblock list %}
-{% block after_list %}
-        {% if is_paginated %}
-
-            {% for page in page_obj.paginator.page_range %}
-                <a href="?page={{ page }}">
-                    {{ page }}
-                </a>
-            {% endfor %}
-            <div class="pagination">
-                <span class="page-links">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}">
-                            previous
-                        </a>
-                    {% endif %}
-                    <span class="page-current">
-                        Page
-                        {{ page_obj.number }}
-                        of
-                        {{ page_obj.paginator.num_pages }}.
-                    </span>
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}">
-                            next
-                        </a>
-                    {% endif %}
-                </span>
-            </div>
-        {% endif %}
-{% endblock after_list %}
+    {% endwith %}
+{% endblock item %}
