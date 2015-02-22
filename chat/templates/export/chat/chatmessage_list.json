@@ -1,9 +1,9 @@
 {
  "about": {
   "title": "telelogue",
-  "TODO:": [
+  "TODO": [
   ]
- }{% if is_paginated%},
+ },{% if is_paginated %}
  "pagination": {
   "page": {{ page_obj.number }},
   "number of pages": {{ page_obj.paginator.num_pages }}
