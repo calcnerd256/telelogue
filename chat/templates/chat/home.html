@@ -5,30 +5,30 @@
         </title>
 {% endblock title %}
 {% block content %}
-        <ul>
-            <li>
+    <ul>
+        <li>
                 <a href="{% url 'message_create' %}">
                     Say somethin'
                 </a>
-            </li>
-            <br />
-            <li>
+        </li>
+        <br />
+        <li>
                 <a href="{% url 'message_list' %}">
                     View the log
                 </a>
-            </li>
-            <br />
+        </li>
+        <br />
             <li>
                 <a href="{% url "today" %}">
                     Today
                 </a>
             </li>
             <br />
-            <li>
+        <li>
                 <a href="{% url "admin:index" %}">
                     administer
                 </a>
-            </li>
+        </li>
             <li>
                 <a href="{% url "untagged_messages" %}">
                     untagged messages
@@ -44,5 +44,5 @@
                     Resolve unmet semantics
                 </a>
             </li>
-        </ul>
+    </ul>
 {% endblock content %}
