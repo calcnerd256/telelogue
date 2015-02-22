@@ -24,15 +24,13 @@
     {% endblock list %}
     {% block after_list %}
         {% block pagination %}
-        {% if is_paginated %}
-
-            {% for page in page_obj.paginator.page_range %}
-                <a href="?page={{ page }}">
-                    {{ page }}
-                </a>
-            {% endfor %}
-            <div class="pagination">
-                <span class="page-links">
+            {% if is_paginated %}
+                {% for page in page_obj.paginator.page_range %}
+                    <a href="?page={{ page }}">
+                        {{ page }}
+                    </a>
+                {% endfor %}
+                <div class="pagination page-links">
                     {% if page_obj.has_previous %}
                         <a href="?page={{ page_obj.previous_page_number }}">
                             &larr;
@@ -49,9 +47,8 @@
                             &rarr;
                         </a>
                     {% endif %}
-                </span>
-            </div>
-        {% endif %}
+                </div>
+            {% endif %}
         {% endblock pagination %}
     {% endblock after_list %}
 {% endblock content %}
