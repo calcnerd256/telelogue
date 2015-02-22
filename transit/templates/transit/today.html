@@ -9,7 +9,7 @@
     <form method="POST" action="{% url "message_create" %}?next={% url "today" %}">
         {% csrf_token %}
         <label for="body">Quick (plain) message:</label>
-        <input type="text" name="body" autofocus="html5" style="width: 100%"></input>
+        <input type="text" name="body" autofocus="html5"></input>
         <input type="submit" value="plain"></input>
     </form>
     <ol>
