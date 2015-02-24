@@ -4,8 +4,8 @@
    :unicode {% with points=object.get_body_codepoints %}{% comment %}
     {% endcomment %}{% if points %}(list{% comment %}
      {% endcomment %}{% if points|length < 16 %}{% for point in points %} {{ point }}{% endfor %}){% comment %}
-     {% endcomment %}{% else %}{% for point in points %} {{ point }}{% if forloop.counter|divisibleby:"16" %}
-   {% endif %}{% endfor %}
+     {% endcomment %}{% else %}{% for point in points %}{% if forloop.counter|divisibleby:"16" %}
+   {% endif %} {{ point }}{% endfor %}
    ){% endif %}{% else %}nil{% endif %}{% endwith %}
    :id {{ object.id }}
   )
