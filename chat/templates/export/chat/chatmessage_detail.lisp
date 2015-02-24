@@ -1,5 +1,5 @@
   (message
-   :time {{ object.timestamp|"U" }} :timezone "{{ object.timestamp|"O" }}"{% comment %}"{% endcomment %}
+   :time {{ object.timestamp|date:"U" }} :timezone "{{ object.timestamp|date:"O" }}"{% comment %}"{% endcomment %}
    :author {% include "export/auth/user.lisp" with object=object.author only %} :authenticity nil
    :unicode {% with points=object.get_body_codepoints %}{% comment %}
     {% endcomment %}{% if points %}(list{% comment %}
