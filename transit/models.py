@@ -27,7 +27,5 @@ class Triple(models.Model):
         if not triples: return None
         return triples[0].destination
 
-    @classmethod
-    @cache_getter
-    def get_query(cls):
-        return cls.lookup(None, None)
+    def current_value(self, author=NotImplemented):
+        return self.lookup(self.source, self.path, author)
