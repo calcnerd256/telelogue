@@ -44,6 +44,7 @@ class Triple(models.Model):
             path = cls.lookup_semantic(path_name)
             if path is None: return None
         destination = cls.lookup(source, path)
+        if destination is None: return None
         with_cache = (source_name, path_name, destination)
         lookup_semantics[name] = with_cache
         return destination
