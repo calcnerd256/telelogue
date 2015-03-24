@@ -10,6 +10,8 @@ def cache_getter(getter):
         return cache["cache"]
     return result
 
+lookup_semantics = {
+}
 
 class Triple(models.Model):
     source = models.ForeignKey(ChatMessage, related_name="source_set", null=True, blank=True)
@@ -26,6 +28,26 @@ class Triple(models.Model):
             triples = triples.filter(author=author)
         if not triples: return None
         return triples[0].destination
+
+    @classmethod
+    def lookup_semantic(cls, name):
+        if name not in lookup_semantics: return None
+        semantics = lookup_semantics[name]
+        if 3 == len(semantics): return semantics[2]
+        source_name, path_name = semantics
+        source = None
+        if source_name is not None:
+            source = cls.lookup_semantic(source_name)
+            if source is None: return None
+        path = None
+        if path_name is not None:
+            path = cls.lookup_semantic(path_name)
+            if path is None: return None
+        destination = cls.lookup(source, path)
+        with_cache = (source_name, path_name, destination)
+        lookup_semantics[name] = with_cache
+        return destination
+
 
     def current_value(self, author=NotImplemented):
         return self.lookup(self.source, self.path, author)
