@@ -12,9 +12,9 @@ def cache_getter(getter):
 
 
 class Triple(models.Model):
-    source = models.ForeignKey(ChatMessage, related_name="source_set")
-    path = models.ForeignKey(ChatMessage, related_name="path_set")
-    destination = models.ForeignKey(ChatMessage, related_name="destination_set")
+    source = models.ForeignKey(ChatMessage, related_name="source_set", null=True, blank=True)
+    path = models.ForeignKey(ChatMessage, related_name="path_set", null=True, blank=True)
+    destination = models.ForeignKey(ChatMessage, related_name="destination_set", null=True, blank=True)
     author = CurrentUserField(add_only=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
