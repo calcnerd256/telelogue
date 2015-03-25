@@ -15,6 +15,10 @@ lookup_semantics = {
     "successor": (None, "query"),
     "root": ("successor", "query"),
     "zero": ("successor", "successor"),
+    "physical": ("root", "zero"),
+    "one": ("successor", "zero"),
+    "mental": ("root", "one"),
+    "type": ("mental", "zero"),
 }
 
 class Triple(models.Model):
@@ -65,6 +69,7 @@ class Triple(models.Model):
         if previous is None: return None
         if n == len(cache): cache.append(previous)
         result = cls.lookup(successor, previous)
+        _type = cls.lookup_semantic("type")
         return result
 
     @classmethod
