@@ -11,6 +11,10 @@ def cache_getter(getter):
     return result
 
 lookup_semantics = {
+    "query": (None, None),
+    "successor": (None, "query"),
+    "root": ("successor", "query"),
+    "zero": ("successor", "successor"),
 }
 
 class Triple(models.Model):
