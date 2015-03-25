@@ -19,6 +19,7 @@ lookup_semantics = {
     "one": ("successor", "zero"),
     "mental": ("root", "one"),
     "type": ("mental", "zero"),
+    "natural": ("zero", "type"),
 }
 
 class Triple(models.Model):
@@ -70,6 +71,11 @@ class Triple(models.Model):
         if n == len(cache): cache.append(previous)
         result = cls.lookup(successor, previous)
         _type = cls.lookup_semantic("type")
+        natural = cls.lookup_semantic("natural")
+        if _type is not None and natural is not None:
+            existing = cls.lookup(result, _type)
+            if existing is None:
+                cls(source=result, path=_type, destination=natural).save()
         return result
 
     @classmethod
