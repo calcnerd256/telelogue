@@ -53,6 +53,19 @@ class Triple(models.Model):
         lookup_semantics[name] = with_cache
         return destination
 
+    @classmethod
+    def lookup_natural(cls, n, cache=[]):
+        n = int(n) # try me
+        if n == 0: return cls.lookup_semantic("zero")
+        if n < 0: return None
+        if n < len(cache): return cache[n]
+        successor = cls.lookup_semantic("successor")
+        if successor is None: return None
+        previous = cls.lookup_natural(n - 1) # recursive
+        if previous is None: return None
+        if n == len(cache): cache.append(previous)
+        result = cls.lookup(successor, previous)
+        return result
 
     @classmethod
     def set_semantic(cls, name, destination, commit=True):
