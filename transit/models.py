@@ -18,6 +18,8 @@ lookup_semantics = {
     "physical": ("root", "zero"),
     "one": ("successor", "zero"),
     "mental": ("root", "one"),
+    "two": ("successor", "one"),
+    "social": ("root", "two"),
     "type": ("mental", "zero"),
     "natural": ("zero", "type"),
 }
