@@ -144,10 +144,18 @@ class UntaggedMessagesView(MessageListView):
         candidates = qs.filter(query)
         return candidates.order_by("timestamp")
 
+    @classmethod
+    def annotate_objects(cls, object_list):
+        tag = Triple.lookup_semantic("tag")
+        if tag is None: return
+        for message in object_list:
+            message.tag = Triple.lookup(tag, message)
+
     def get_context_data(self, *args, **kwargs):
         context = super(UntaggedMessagesView, self).get_context_data(*args, **kwargs)
         context["tags"] = Triple.get_tags()
         context["tag_tag"] = Triple.lookup_semantic("tag")
+        self.annotate_objects(context["object_list"])
         return context
 
 class TaggedMessagesView(DetailView):

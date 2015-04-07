@@ -64,12 +64,14 @@ class Triple(models.Model):
         semantics = lookup_semantics[name]
         if 3 == len(semantics): return semantics[2]
         source_name, path_name = semantics
-        source = None
-        if source_name is not None:
+        if source_name is None:
+            source = None
+        else:
             source = cls.lookup_semantic(source_name)
             if source is None: return None
-        path = None
-        if path_name is not None:
+        if path_name is None:
+            path = None
+        else:
             path = cls.lookup_semantic(path_name)
             if path is None: return None
         destination = cls.lookup(source, path)
