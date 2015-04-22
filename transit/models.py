@@ -22,6 +22,13 @@ lookup_semantics = {
     "social": ("root", "two"),
     "type": ("mental", "zero"),
     "natural": ("zero", "type"),
+    "agent": ("social", "zero"),
+    "peer": ("agent", "zero"),
+    "user": ("agent", "one"),
+    "nobody": ("user", "zero"),
+    "superuser": ("user", "one"),
+    "local": ("peer", "zero"),
+    "process": ("agent", "two"),
 }
 
 class Triple(models.Model):
