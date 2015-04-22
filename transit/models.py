@@ -30,6 +30,9 @@ lookup_semantics = {
     "local": ("peer", "zero"),
     "process": ("agent", "two"),
     "transit": ("process", "zero"),
+    "telelogue": ("process", "one"),
+    "featurebag": ("telelogue", "one"),
+    "tag": ("featurebag", "one"),
 }
 
 class Triple(models.Model):
