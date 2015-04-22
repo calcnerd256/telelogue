@@ -29,6 +29,7 @@ lookup_semantics = {
     "superuser": ("user", "one"),
     "local": ("peer", "zero"),
     "process": ("agent", "two"),
+    "transit": ("process", "zero"),
 }
 
 class Triple(models.Model):
