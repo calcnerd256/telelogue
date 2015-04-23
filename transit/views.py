@@ -121,7 +121,8 @@ class UnmetSemanticsView(MessageListView):
                 "source": source,
                 "path": path,
             }
-        return [map_step(name) for name in lookup_semantics.keys() if filter_step(name)]
+        names = lookup_semantics().keys()
+        return map(map_step, filter(filter_step, names))
 
 
     def get_context_data(self, *args, **kwargs):
