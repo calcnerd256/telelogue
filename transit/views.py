@@ -16,6 +16,7 @@ from .models import (
     Triple,
 )
 from chat.models import ChatMessage
+from chat.views import MessageListView
 
 # this app's imports
 
@@ -80,3 +81,7 @@ class CreateFromThreeMessagesView(CreateView):
         result["path"] = self.get_path()
         result["destination"] = self.get_destination()
         return result
+
+
+class UnmetSemanticsView(MessageListView):
+    template_name = "transit/unmet_semantics.html"
