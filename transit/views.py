@@ -113,7 +113,7 @@ class UnmetSemanticsView(MessageListView):
                 "source": source,
                 "path": path,
             }
-        names = lookup_semantics().keys()
+        names = lookup_semantics.keys()
         return map(map_step, filter(filter_step, names))
 
 
