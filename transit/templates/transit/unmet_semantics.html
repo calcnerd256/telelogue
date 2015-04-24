@@ -1,4 +1,24 @@
 {% extends "chat/chatmessage_list.html" %}
+{% block before_list %}
+    <dl>
+        {% for object in semantic_fringe %}
+            <dt>{{ object.name }}</dt>
+            <dd>
+                <a href="{{ object.source.value.get_absolute_url }}">
+                    {{ object.source.name }}</a>
+                <a href="{{ object.path.value.get_absolute_url }}">
+                    {{ object.path.name }}
+                </a>
+            </dd>
+        {% endfor %}
+    </dl>
+{% endblock before_list %}
+
 {% block item %}
     {{ block.super }}
+    Is it any of these?
+    {% for candidate in semantic_fringe %}
+        <a href="{% url "create_from_three_messages" candidate.source.value.pk candidate.path.value.pk object.pk %}">
+            {{ candidate.name }}</a>
+    {% endfor %}
 {% endblock item %}
