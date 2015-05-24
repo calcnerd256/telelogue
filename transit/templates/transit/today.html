@@ -13,8 +13,21 @@
         <input type="submit" value="plain"></input>
     </form>
     <ol>
+      {% if not object_list.0.hide %}
         {% include "transit/_message_preview.html" with object=object_list|first %}
+      {% endif %}
+      {% if not object_list.1.hide %}
         {% include "transit/_message_preview.html" with object=object_list.1 %}
+      {% endif %}
+      {% if not object_list.2.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.2 %}
+      {% endif %}
+      {% if not object_list.3.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.3 %}
+      {% endif %}
+      {% if not object_list.4.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.4 %}
+      {% endif %}
     </ol>
     <h3>sticky</h3>
     <ul>
