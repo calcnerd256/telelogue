@@ -1,10 +1,10 @@
 # Django settings for telelogue project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+     ('Montana Rowe', 'calcnerd256@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -23,7 +23,9 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "*",
+]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -83,6 +85,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
+#from .secret import SECRET_KEY
 SECRET_KEY = 'w@lx8tflx+19_07d2!brukqlnc=35-ro3onmw7&ts40f6t$o7*'
 
 # List of callables that know how to import templates from various sources.
