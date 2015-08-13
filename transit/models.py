@@ -33,6 +33,13 @@ lookup_semantics = {
     "telelogue": ("process", "one"),
     "featurebag": ("telelogue", "one"),
     "tag": ("featurebag", "one"),
+    "hide": ("featurebag", "two"),
+    "three": ("successor", "two"),
+    "reply": ("featurebag", "three"),
+    "four": ("successor", "three"),
+    "sticky": ("featurebag", "four"),
+    "five": ("successor", "four"),
+    "reply tag": ("featurebag", "five"),
 }
 
 class Triple(models.Model):

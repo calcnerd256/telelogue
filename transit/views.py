@@ -1,10 +1,12 @@
 # python imports
+import datetime
 
 # django imports
 from django.db.models import Q
 from django.views.generic import (
     CreateView,
     DetailView,
+    ListView,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -173,6 +175,68 @@ class TaggedMessagesView(DetailView):
         context["object_list"] = self.get_tagged_messages()
         return context
 
+
+class TodayView(ListView):
+    model = ChatMessage
+    template_name = "transit/today.html"
+
+    def get_sticky_messages(self):
+        sticky = Triple.lookup_semantic("sticky")
+        if sticky is None:
+            return None
+        stickings = sticky.source_set.all()
+        stickers = (edge.path for edge in stickings if edge.current_value() is not None)
+        result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
+        return result.order_by("timestamp")
+
+    def enhance_message(self, message):
+        hidden = Triple.lookup_semantic("hide")
+        if hidden is not None:
+            message.hide = Triple.lookup(hidden, message)
+
+        sticky = Triple.lookup_semantic("sticky")
+        if sticky is not None:
+            message.sticky = Triple.lookup(sticky, message)
+
+        reply = Triple.lookup_semantic("reply")
+        if reply is not None:
+            message.parent = Triple.lookup(reply, message)
+
+        tag = Triple.lookup_semantic("tag")
+        if tag is not None:
+            message.tag = Triple.lookup(tag, message)
+            reply_tag = Triple.lookup_semantic("reply tag")
+            if reply_tag is not None and message.tag is not None:
+                if reply_tag.pk == message.tag.pk:
+                    if message.parent:
+                        message.tag = {
+                            "pk": message.tag.pk,
+                            "get_body_preview": "a reply",
+                        }
+
+        return message
+
+    def get_queryset(self):
+        qs = super(TodayView, self).get_queryset()
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(1)
+        yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
+        result = qs.filter(timestamp__gte=yesterday_midnight)
+        result = result.order_by("-timestamp")
+        result = (self.enhance_message(message) for message in result)
+        return result
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TodayView, self).get_context_data(*args, **kwargs)
+        hidden = Triple.lookup_semantic("hide")
+        context["hide_pk"] = hidden.pk if hidden else None
+        context["this_page"] = self.request.path
+        stick = Triple.lookup_semantic("sticky")
+        context["sticky_pk"] = stick.pk if stick else None
+        context["sticky_posts"] = (self.enhance_message(post) for post in self.get_sticky_messages())
+        # force the generator so that I can reuse its results
+        context["object_list"] = list(context["object_list"])
+        return context
 
 class ChatMessageDetailView(DetailView):
     model = ChatMessage
