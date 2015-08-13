@@ -1,1 +1,12 @@
 {% extends "chat/list.html" %}
+{% block before_list %}
+    {{ block.super }}
+{% endblock before_list %}
+{% block item %}
+  {% if not object.hide %}
+    {{ block.super }}
+  {% endif %}
+{% endblock item %}
+{% block after_list %}
+    {{ block.super }}
+{% endblock after_list %}
