@@ -22,6 +22,17 @@ lookup_semantics = {
     "social": ("root", "two"),
     "type": ("mental", "zero"),
     "natural": ("zero", "type"),
+    "agent": ("social", "zero"),
+    "peer": ("agent", "zero"),
+    "user": ("agent", "one"),
+    "nobody": ("user", "zero"),
+    "superuser": ("user", "one"),
+    "local": ("peer", "zero"),
+    "process": ("agent", "two"),
+    "transit": ("process", "zero"),
+    "telelogue": ("process", "one"),
+    "featurebag": ("telelogue", "one"),
+    "tag": ("featurebag", "one"),
 }
 
 class Triple(models.Model):
@@ -91,6 +102,14 @@ class Triple(models.Model):
         if path is None and pn is not None: return None
         result = cls(source=source, path=path, destination=destination)
         if commit: result.save()
+        return result
+
+    @classmethod
+    def get_tags(cls):
+        tag = cls.lookup_semantic("tag")
+        if tag is None: return None
+        trips = cls.objects.filter(source=tag, destination=tag)
+        result = [t.path for t in trips if cls.lookup(tag, t.path) == tag]
         return result
 
 
