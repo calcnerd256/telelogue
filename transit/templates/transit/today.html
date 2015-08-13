@@ -1,12 +1,53 @@
 {% extends "chat/list.html" %}
 {% block before_list %}
     {{ block.super }}
+    <a href="{% url "home" %}">
+        Home
+    </a>
+    <br />
+    <h3>most recent</h3>
+    <form method="POST" action="{% url "message_create" %}?next={% url "today" %}">
+        {% csrf_token %}
+        <label for="body">Quick (plain) message:</label>
+        <input type="text" name="body" autofocus="html5"></input>
+        <input type="submit" value="plain"></input>
+    </form>
+    <ol>
+      {% if not object_list.0.hide %}
+        {% include "transit/_message_preview.html" with object=object_list|first %}
+      {% endif %}
+      {% if not object_list.1.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.1 %}
+      {% endif %}
+      {% if not object_list.2.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.2 %}
+      {% endif %}
+      {% if not object_list.3.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.3 %}
+      {% endif %}
+      {% if not object_list.4.hide %}
+        {% include "transit/_message_preview.html" with object=object_list.4 %}
+      {% endif %}
+    </ol>
+    <h3>sticky</h3>
+    <ul>
+        {% for object in sticky_posts %}
+            {% include "transit/_message_preview.html" %}
+        {% endfor %}
+    </ul>
+    <h3>today's messages</h3>
+    <a href="{% url "message_create" %}">
+        New message</a>
+    (plain)
 {% endblock before_list %}
 {% block item %}
   {% if not object.hide %}
-    {{ block.super }}
+    {% include "transit/_message_preview.html" %}
   {% endif %}
 {% endblock item %}
 {% block after_list %}
     {{ block.super }}
+    <a href="{% url "message_list" %}">
+        All messages</a>
+    (plain, paginated)
 {% endblock after_list %}
