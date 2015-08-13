@@ -13,7 +13,7 @@ from django.shortcuts import (
     get_object_or_404,
 )
 from django.core.urlresolvers import (
-   reverse_lazy,
+    reverse_lazy,
 )
 
 # third-party app imports
