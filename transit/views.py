@@ -3,6 +3,7 @@
 # django imports
 from django.views.generic import (
     CreateView,
+    DetailView,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -120,4 +121,21 @@ class UnmetSemanticsView(MessageListView):
     def get_context_data(self, *args, **kwargs):
         context = super(UnmetSemanticsView, self).get_context_data(*args, **kwargs)
         context["semantic_fringe"] = self.get_candidates()
+        return context
+
+
+class TaggedMessagesView(DetailView):
+    model = ChatMessage
+    template_name = "transit/tag/tagged_messages.html"
+    def get_tagged_messages(self):
+        tag = self.get_object()
+        tag_tag = Triple.lookup_semantic("tag")
+        potential_edges = tag.destination_set
+        if not tag_tag: return [e.path for e in potential_edges]
+        edges = potential_edges.filter(source=tag_tag)
+        return self.model.objects.filter(pk__in=edges.values_list("path", flat=True))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
+        context["object_list"] = self.get_tagged_messages()
         return context
