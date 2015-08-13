@@ -48,7 +48,7 @@ urlpatterns = patterns(
         login_required(
             TaggedMessagesView.as_view()
         ),
-        name="tagged_messages"
+        name="tagged_messages",
     ),
     url(
         r'^message/(?P<pk>\d+)/detail/$',
