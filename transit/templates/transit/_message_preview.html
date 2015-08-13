@@ -1,1 +1,11 @@
 {% extends "chat/_message_preview.html" %}
+{% block detail_link %}
+    {% if object.pk %}
+        <a href="{% url "transit_message_detail" object.pk %}">
+    {% endif %}
+            {{ object.timestamp }}{% if object.pk %}</a>
+    {% endif %}
+{% endblock detail_link %}
+{% block metadata %}
+    {{ block.super }}
+{% endblock metadata %}
