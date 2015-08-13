@@ -10,6 +10,9 @@ from django.forms import HiddenInput
 from django.shortcuts import (
     get_object_or_404,
 )
+from django.core.urlresolvers import (
+    reverse_lazy,
+)
 
 # third-party app imports
 
@@ -37,6 +40,7 @@ def cache_getter(name):
 class CreateFromThreeMessagesView(CreateView):
     model = Triple
     template_name = "transit/triple/create/from_messages.html"
+    success_url = reverse_lazy("untagged_messages")
 
     def get_success_url(self):
         url = self.request.GET.get("next")
