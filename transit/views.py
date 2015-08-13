@@ -177,3 +177,82 @@ class TaggedMessagesView(DetailView):
 class ChatMessageDetailView(DetailView):
     model = ChatMessage
     template_name = "transit/message_detail.html"
+
+    def get_sources(self):
+        candidates = self.get_object().source_set.all()
+        paths = set(
+            [
+                trip.path.pk if trip.path is not None else 0
+                for trip
+                in candidates
+            ]
+        )
+        representatives = [
+            [
+                trip
+                for trip
+                in candidates
+                if (trip.path is not None and trip.path.pk == pk)
+                or (trip.path is None and pk == 0)
+            ][0]
+            for pk
+            in paths
+        ]
+        return [
+            {
+                "source": t.source, # should be self.get_object()
+                "path": t.path,
+                "destination": t.current_value(),
+            }
+            for t
+            in representatives
+        ]
+
+    def get_paths(self):
+        candidates = self.get_object().path_set.all()
+        sources = set(
+            [
+                trip.source.pk if trip.source is not None else 0
+                for trip
+                in candidates
+            ]
+        )
+        representatives = [
+            [
+                trip
+                for trip
+                in candidates
+                if (trip.source is not None and trip.source.pk == pk)
+                or (trip.source is None and pk == 0)
+            ][0]
+            for pk
+            in sources
+        ]
+        return [
+            {
+                "source": t.source,
+                "path": t.path, # should be self.get_object()
+                "destination": t.current_value(),
+            }
+            for t
+            in representatives
+        ]
+
+    def get_destinations(self):
+        ob = self.get_object()
+        candidates = ob.destination_set.all()
+        return [
+            edge
+            for edge
+            in candidates
+            if (
+                lambda d: d is not None and d.pk == ob.pk
+            )(edge.current_value())
+        ]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ChatMessageDetailView, self).get_context_data(*args, **kwargs)
+        context["sources"] = self.get_sources()
+        context["paths"] = self.get_paths()
+        context["destinations"] = self.get_destinations()
+        return context
