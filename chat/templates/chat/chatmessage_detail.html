@@ -4,18 +4,18 @@
         Home
     </a>
     <div>
-Author:
-<a href="{{ object.get_author_url }}">
-    {{ object.author }}
-</a>
+            Author:
+            <a href="{{ object.get_author_url }}">
+                {{ object.author }}
+            </a>
     </div>
     <div>
-Posted at:
-{{ object.timestamp }}
+            Posted at:
+            {{ object.timestamp }}
     </div>
     <div>
-Body of message:
-<br />
+            Body of message:
+            <br />
 <pre>{{ object.body|urlize }}</pre>
     </div>
 {% endblock content %}
