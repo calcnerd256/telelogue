@@ -172,3 +172,8 @@ class TaggedMessagesView(DetailView):
         context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
         context["object_list"] = self.get_tagged_messages()
         return context
+
+
+class ChatMessageDetailView(DetailView):
+    model = ChatMessage
+    template_name = "transit/message_detail.html"
