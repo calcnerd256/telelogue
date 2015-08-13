@@ -1,6 +1,7 @@
 # python imports
 
 # django imports
+from django.db.models import Q
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -123,6 +124,34 @@ class UnmetSemanticsView(MessageListView):
         context["semantic_fringe"] = self.get_candidates()
         return context
 
+
+class UntaggedMessagesView(MessageListView):
+    template_name="transit/untagged_messages.html"
+    def get_queryset(self):
+        qs = super(UntaggedMessagesView, self).get_queryset()
+        tag = Triple.lookup_semantic("tag")
+        if tag is None: return qs
+        tags = Triple.get_tags()
+        taggings = Triple.objects.filter(source=tag)
+        tagged = taggings.values("path")
+        tag_removed = taggings.filter(destination=None).values("path")
+        query = Q(pk__in=tag_removed)|~Q(pk__in=tagged)
+        candidates = qs.filter(query)
+        return candidates.order_by("timestamp")
+
+    @classmethod
+    def annotate_objects(cls, object_list):
+        tag = Triple.lookup_semantic("tag")
+        if tag is None: return
+        for message in object_list:
+            message.tag = Triple.lookup(tag, message)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(UntaggedMessagesView, self).get_context_data(*args, **kwargs)
+        context["tags"] = Triple.get_tags()
+        context["tag_tag"] = Triple.lookup_semantic("tag")
+        self.annotate_objects(context["object_list"])
+        return context
 
 class TaggedMessagesView(DetailView):
     model = ChatMessage
