@@ -22,6 +22,7 @@ from django.core.urlresolvers import (
 from .models import (
     lookup_semantics,
     Triple,
+    FailSilently,
 )
 from chat.models import ChatMessage
 from chat.views import MessageListView
@@ -176,14 +177,19 @@ class TaggedMessagesView(DetailView):
         return context
 
 
+def fail_with(fallback):
+    class result(FailSilently):
+        default_value = fallback
+    return result
+
+
 class TodayView(ListView):
     model = ChatMessage
     template_name = "transit/today.html"
 
+    @fail_with([])
     def get_sticky_messages(self):
-        sticky = Triple.lookup_semantic("sticky")
-        if sticky is None:
-            return None
+        sticky = Triple.edges.lookup_semantic("sticky")
         stickings = sticky.source_set.all()
         stickers = (edge.path for edge in stickings if edge.current_value() is not None)
         result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
@@ -233,7 +239,7 @@ class TodayView(ListView):
         context["this_page"] = self.request.path
         stick = Triple.lookup_semantic("sticky")
         context["sticky_pk"] = stick.pk if stick else None
-        context["sticky_posts"] = (self.enhance_message(post) for post in self.get_sticky_messages())
+        context["sticky_posts"] = map(self.enhance_message, self.get_sticky_messages())
         # force the generator so that I can reuse its results
         context["object_list"] = list(context["object_list"])
         return context

@@ -1,3 +1,5 @@
+from types import MethodType
+import warnings
 from django.db import models
 from cuser.fields import CurrentUserField
 from chat.models import ChatMessage
@@ -51,19 +53,76 @@ lookup_semantics = {
 }
 
 
-def fail_silently(fn):
-    def result(*args, **kwargs):
+class Decorum(object):
+    decorated = None
+    def __init__(self, decorated):
+        self.decorated = decorated
+
+    __get__ = MethodType
+
+    def before_call(self, *args, **kwargs):
+        return self.decorated, args, kwargs
+
+    def after_call(self, result):
+        return result
+
+    def call(self, fn, args, kwargs):
+        return fn(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self.after_call(
+            self.call(
+                *self.before_call(
+                    *args,
+                    **kwargs
+                )
+            )
+        )
+
+
+class FailSilently(Decorum):
+    failure_class = SilentLookupFailure
+    default_value = None
+    def call(self, *args, **kwargs):
         try:
-            return fn(*args, **kwargs)
-        except SilentLookupFailure:
-            return None
-    return result
+            return super(FailSilently, self).call(*args, **kwargs)
+        except Exception as e:
+            if not isinstance(e, self.failure_class):
+                raise
+            return self.default_value
 
 
-def listify(fn):
-    def result(*args, **kwargs):
-        return list(fn(*args, **kwargs))
-    return result
+class Listify(Decorum):
+    composer = list
+    def after_call(self, *args, **kwargs):
+        return self.composer(*args, **kwargs)
+
+
+class Deprecate(Decorum):
+    message = "deprecated"
+    category = DeprecationWarning
+    def warn(self, *args, **kwargs):
+        warnings.warn(self.message, self.category, *args, **kwargs)
+
+    def before_call(self, *args, **kwargs):
+        self.warn()
+        return super(Deprecate, self).before_call(*args, **kwargs)
+
+
+class ClassMethod(Decorum):
+    cls = None
+
+    def call(self, fn, args, *arfs, **kwargs):
+        return super(ClassMethod, self).call(fn, [self.cls] + list(args), *arfs, **kwargs)
+
+    def __get__(self, obj, cls=None):
+        self.cls = cls
+        if self.cls is None: self.cls = type(obj)
+        return self
+
+
+class Managed(ClassMethod, FailSilently, Deprecate):
+    pass
 
 
 class Triple(models.Model):
@@ -79,36 +138,30 @@ class Triple(models.Model):
 
     semantics = lookup_semantics
 
-    # TODO: use only the manager methods and deprecate the class methods
-    @classmethod
-    @fail_silently
+    @Managed
     def lookup(cls, source, path, author=NotImplemented):
         return cls.edges.lookup(source, path, author)
 
-    @classmethod
-    @fail_silently
+    @Managed
     def lookup_semantic(cls, name):
         return cls.edges.lookup_semantic(name)
 
-    @classmethod
-    @fail_silently
+    @Managed
     def lookup_natural(cls, n, cache=NotImplemented):
         if cache is NotImplemented:
             return cls.util.lookup_natural(n)
         return cls.util.lookup_natural(n, cache)
 
-    @classmethod
-    @fail_silently
+    @Managed
     def set_semantic(cls, name, destination, commit=True):
         return cls.edges.set_semantic(name, destination, commit)
 
-    @classmethod
-    @fail_silently
-    @listify
+    @Managed
+    @Listify
     def get_tags(cls):
         return cls.util.get_tags()
 
-    @fail_silently
+    @FailSilently
     def current_value(self, author=NotImplemented):
         edges = self.__class__.edges
         source = self.source
