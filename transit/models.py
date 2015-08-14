@@ -2,6 +2,12 @@ from django.db import models
 from cuser.fields import CurrentUserField
 from chat.models import ChatMessage
 
+from .managers import (
+    EdgeManager,
+    SilentLookupFailure,
+)
+
+
 def cache_getter(getter):
     cache = {}
     def result(*args, **kwargs):
@@ -42,15 +48,17 @@ lookup_semantics = {
     "reply tag": ("featurebag", "five"),
 }
 
-class SilentLookupFailure(Exception):
-    pass
-
 def fail_silently(fn):
     def result(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except SilentLookupFailure:
             return None
+    return result
+
+def listify(fn):
+    def result(*args, **kwargs):
+        return list(fn(*args, **kwargs))
     return result
 
 class Triple(models.Model):
@@ -60,16 +68,14 @@ class Triple(models.Model):
     author = CurrentUserField(add_only=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # TODO: manager method
+    objects = models.Manager()
+    edges = EdgeManager()
+
+    # TODO: manager methods
     @classmethod
     @fail_silently
     def lookup(cls, source, path, author=NotImplemented):
-        triples = cls.objects.filter(source=source, path=path).order_by("-timestamp")
-        if author is not NotImplemented:
-            triples = triples.filter(author=author)
-        if not triples:
-            raise SilentLookupFailure()
-        return triples[0].destination
+        return cls.edges.lookup(source, path, author)
 
     @classmethod
     @fail_silently
@@ -89,9 +95,8 @@ class Triple(models.Model):
             path = cls.lookup_semantic(path_name)
             if path is None:
                 raise SilentLookupFailure()
-        destination = cls.lookup(source, path)
-        if destination is None:
-            raise SilentLookupFailure()
+        destination = cls.edges.lookup(source, path)
+        # previously, deletion led to failure; now, deletion stores None in the cache
         with_cache = (source_name, path_name, destination)
         lookup_semantics[name] = with_cache
         return destination
@@ -115,8 +120,9 @@ class Triple(models.Model):
         _type = cls.lookup_semantic("type")
         natural = cls.lookup_semantic("natural")
         if _type is not None and natural is not None:
-            existing = cls.lookup(result, _type)
-            if existing is None:
+            try:
+                cls.edges.lookup(result, _type)
+            except SilentLookupFailure:
                 cls(source=result, path=_type, destination=natural).save()
         return result
 
@@ -138,15 +144,19 @@ class Triple(models.Model):
 
     @classmethod
     @fail_silently
+    @listify
     def get_tags(cls):
         tag = cls.lookup_semantic("tag")
         if tag is None:
             raise SilentLookupFailure()
-        trips = cls.objects.filter(source=tag, destination=tag)
-        result = [t.path for t in trips if cls.lookup(tag, t.path) == tag]
-        return result
+        for t in cls.objects.filter(source=tag, destination=tag):
+            try:
+                if cls.edges.lookup(tag, t.path) == tag:
+                    yield t.path
+            except SilentLookupFailure:
+                pass
 
 
     @fail_silently
     def current_value(self, author=NotImplemented):
-        return self.lookup(self.source, self.path, author)
+        return Triple.edges.lookup(self.source, self.path, author)
