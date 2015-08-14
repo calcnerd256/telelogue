@@ -88,39 +88,35 @@ class Triple(models.Model):
     @fail_silently
     def lookup_natural(cls, n, cache=[]):
         n = int(n) # try me
-        if n == 0: return cls.lookup_semantic("zero")
+        if n == 0: return cls.edges.lookup_semantic("zero")
         if n < 0:
             raise SilentLookupFailure()
         if n < len(cache): return cache[n]
-        successor = cls.lookup_semantic("successor")
-        if successor is None:
-            raise SilentLookupFailure()
+        successor = cls.edges.lookup_semantic("successor")
         previous = cls.lookup_natural(n - 1) # recursive
         if previous is None:
             raise SilentLookupFailure()
         if n == len(cache): cache.append(previous)
         result = cls.lookup(successor, previous)
-        _type = cls.lookup_semantic("type")
-        natural = cls.lookup_semantic("natural")
-        if _type is not None and natural is not None:
+        try:
+            _type = cls.edges.lookup_semantic("type")
+            natural = cls.edges.lookup_semantic("natural")
             try:
                 cls.edges.lookup(result, _type)
             except SilentLookupFailure:
                 cls(source=result, path=_type, destination=natural).save()
+        except SilentLookupFailure:
+            pass
         return result
 
     @classmethod
     @fail_silently
     def set_semantic(cls, name, destination, commit=True):
         # definitely a bootstrapping helper and nothing more
-        semantics = lookup_semantics[name] # fail loudly: assume name in dict
-        sn, pn = semantics # fail loudly: assume not already cached
-        source = cls.lookup_semantic(sn)
-        if source is None and sn is not None:
-            raise SilentLookupFailure()
-        path = cls.lookup_semantic(pn)
-        if path is None and pn is not None:
-            raise SilentLookupFailure()
+        source, path = map(  # fail loudly: assume not already cached
+            cls.edges.lookup_semantic,
+            cls.semantics[name]  # fail loudly: assume name in dict
+        )
         result = cls(source=source, path=path, destination=destination)
         if commit: result.save()
         return result
@@ -129,9 +125,7 @@ class Triple(models.Model):
     @fail_silently
     @listify
     def get_tags(cls):
-        tag = cls.lookup_semantic("tag")
-        if tag is None:
-            raise SilentLookupFailure()
+        tag = cls.edges.lookup_semantic("tag")
         for t in cls.objects.filter(source=tag, destination=tag):
             try:
                 if cls.edges.lookup(tag, t.path) == tag:
