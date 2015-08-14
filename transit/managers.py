@@ -13,3 +13,15 @@ class EdgeManager(models.Manager):
         if not triples:
             raise SilentLookupFailure()
         return triples[0].destination
+
+    def lookup_semantic(self, name):
+        if name is None: return None
+        if name not in self.model.semantics:
+            raise SilentLookupFailure()
+        semantics = self.model.semantics[name]
+        if 3 == len(semantics): return semantics[2]
+        destination = self.lookup(*map(self.lookup_semantic, semantics))
+        # previously, deletion led to failure; now, deletion stores None in the cache
+        with_cache = tuple(list(semantics) + [destination])
+        self.model.semantics[name] = with_cache
+        return destination

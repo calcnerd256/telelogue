@@ -71,6 +71,8 @@ class Triple(models.Model):
     objects = models.Manager()
     edges = EdgeManager()
 
+    semantics = lookup_semantics
+
     # TODO: manager methods
     @classmethod
     @fail_silently
@@ -80,26 +82,7 @@ class Triple(models.Model):
     @classmethod
     @fail_silently
     def lookup_semantic(cls, name):
-        if name not in lookup_semantics:
-            raise SilentLookupFailure()
-        semantics = lookup_semantics[name]
-        if 3 == len(semantics): return semantics[2]
-        source_name, path_name = semantics
-        source = None
-        if source_name is not None:
-            source = cls.lookup_semantic(source_name)
-            if source is None:
-                raise SilentLookupFailure()
-        path = None
-        if path_name is not None:
-            path = cls.lookup_semantic(path_name)
-            if path is None:
-                raise SilentLookupFailure()
-        destination = cls.edges.lookup(source, path)
-        # previously, deletion led to failure; now, deletion stores None in the cache
-        with_cache = (source_name, path_name, destination)
-        lookup_semantics[name] = with_cache
-        return destination
+        return cls.edges.lookup_semantic(name)
 
     @classmethod
     @fail_silently
