@@ -25,3 +25,13 @@ class EdgeManager(models.Manager):
         with_cache = tuple(list(semantics) + [destination])
         self.model.semantics[name] = with_cache
         return destination
+
+    def set_semantic(self, name, destination, commit=True):
+        # definitely a bootstrapping helper and nothing more
+        source, path = map(  # fail loudly: assume not already cached
+            self.lookup_semantic,
+            self.model.semantics[name]  # fail loudly: assume name in dict
+        )
+        result = self.model(source=source, path=path, destination=destination)
+        if commit: result.save()
+        return result

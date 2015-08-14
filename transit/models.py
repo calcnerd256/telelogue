@@ -16,6 +16,7 @@ def cache_getter(getter):
         return cache["cache"]
     return result
 
+
 lookup_semantics = {
     "query": (None, None),
     "successor": (None, "query"),
@@ -48,6 +49,7 @@ lookup_semantics = {
     "reply tag": ("featurebag", "five"),
 }
 
+
 def fail_silently(fn):
     def result(*args, **kwargs):
         try:
@@ -56,10 +58,12 @@ def fail_silently(fn):
             return None
     return result
 
+
 def listify(fn):
     def result(*args, **kwargs):
         return list(fn(*args, **kwargs))
     return result
+
 
 class Triple(models.Model):
     source = models.ForeignKey(ChatMessage, related_name="source_set", null=True, blank=True)
@@ -73,7 +77,7 @@ class Triple(models.Model):
 
     semantics = lookup_semantics
 
-    # TODO: manager methods
+    # TODO: use only the manager methods and deprecate the class methods
     @classmethod
     @fail_silently
     def lookup(cls, source, path, author=NotImplemented):
@@ -97,7 +101,7 @@ class Triple(models.Model):
         if previous is None:
             raise SilentLookupFailure()
         if n == len(cache): cache.append(previous)
-        result = cls.lookup(successor, previous)
+        result = fail_silently(cls.edges.lookup)(successor, previous)
         try:
             _type = cls.edges.lookup_semantic("type")
             natural = cls.edges.lookup_semantic("natural")
@@ -112,14 +116,7 @@ class Triple(models.Model):
     @classmethod
     @fail_silently
     def set_semantic(cls, name, destination, commit=True):
-        # definitely a bootstrapping helper and nothing more
-        source, path = map(  # fail loudly: assume not already cached
-            cls.edges.lookup_semantic,
-            cls.semantics[name]  # fail loudly: assume name in dict
-        )
-        result = cls(source=source, path=path, destination=destination)
-        if commit: result.save()
-        return result
+        return cls.edges.set_semantic(name, destination, commit)
 
     @classmethod
     @fail_silently
@@ -133,7 +130,9 @@ class Triple(models.Model):
             except SilentLookupFailure:
                 pass
 
-
     @fail_silently
     def current_value(self, author=NotImplemented):
-        return Triple.edges.lookup(self.source, self.path, author)
+        edges = self.__class__.edges
+        source = self.source
+        path = self.path
+        return edges.lookup(source, path, author)
