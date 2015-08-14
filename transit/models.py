@@ -5,6 +5,7 @@ from chat.models import ChatMessage
 from .managers import (
     EdgeManager,
     SilentLookupFailure,
+    TransitManager,
 )
 
 
@@ -74,6 +75,7 @@ class Triple(models.Model):
 
     objects = models.Manager()
     edges = EdgeManager()
+    util = TransitManager()
 
     semantics = lookup_semantics
 
@@ -101,7 +103,8 @@ class Triple(models.Model):
         if previous is None:
             raise SilentLookupFailure()
         if n == len(cache): cache.append(previous)
-        result = fail_silently(cls.edges.lookup)(successor, previous)
+        result = cls.edges.lookup(successor, previous)
+        # the above used to fail silently, but now it cascades its failure
         try:
             _type = cls.edges.lookup_semantic("type")
             natural = cls.edges.lookup_semantic("natural")
@@ -122,13 +125,7 @@ class Triple(models.Model):
     @fail_silently
     @listify
     def get_tags(cls):
-        tag = cls.edges.lookup_semantic("tag")
-        for t in cls.objects.filter(source=tag, destination=tag):
-            try:
-                if cls.edges.lookup(tag, t.path) == tag:
-                    yield t.path
-            except SilentLookupFailure:
-                pass
+        return cls.util.get_tags()
 
     @fail_silently
     def current_value(self, author=NotImplemented):

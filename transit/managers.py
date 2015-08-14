@@ -35,3 +35,16 @@ class EdgeManager(models.Manager):
         result = self.model(source=source, path=path, destination=destination)
         if commit: result.save()
         return result
+
+
+class TransitManager(models.Manager):
+    def get_tags(self):
+        edges = self.model.edges
+        tag = edges.lookup_semantic("tag")
+        for t in self.filter(source=tag, destination=tag):
+            try:
+                path = t.path
+                if edges.lookup(tag, path) == tag:
+                    yield path
+            except SilentLookupFailure:
+                pass
