@@ -92,29 +92,10 @@ class Triple(models.Model):
 
     @classmethod
     @fail_silently
-    def lookup_natural(cls, n, cache=[]):
-        n = int(n) # try me
-        if n == 0: return cls.edges.lookup_semantic("zero")
-        if n < 0:
-            raise SilentLookupFailure()
-        if n < len(cache): return cache[n]
-        successor = cls.edges.lookup_semantic("successor")
-        previous = cls.lookup_natural(n - 1) # recursive
-        if previous is None:
-            raise SilentLookupFailure()
-        if n == len(cache): cache.append(previous)
-        result = cls.edges.lookup(successor, previous)
-        # the above used to fail silently, but now it cascades its failure
-        try:
-            _type = cls.edges.lookup_semantic("type")
-            natural = cls.edges.lookup_semantic("natural")
-            try:
-                cls.edges.lookup(result, _type)
-            except SilentLookupFailure:
-                cls(source=result, path=_type, destination=natural).save()
-        except SilentLookupFailure:
-            pass
-        return result
+    def lookup_natural(cls, n, cache=NotImplemented):
+        if cache is NotImplemented:
+            return cls.util.lookup_natural(n)
+        return cls.util.lookup_natural(n, cache)
 
     @classmethod
     @fail_silently
