@@ -22,7 +22,8 @@ class PageTitleMixin(object):
         return context
 
 
-class ChatHomeView(TemplateView):
+class ChatHomeView(PageTitleMixin, TemplateView):
+    page_title = 'Home'
     template_name = 'chat/home.html'
 
 
