@@ -14,7 +14,9 @@
             {% endblock detail_link %}
         {% endblock metadata %}
     </span>
+  {% block message_body %}
     <p>
         {{ object.body|linebreaksbr }}
     </p>
+  {% endblock message_body %}
 </{{ wrapper_element|default:"li"}}>

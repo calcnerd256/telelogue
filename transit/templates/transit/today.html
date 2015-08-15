@@ -9,12 +9,12 @@
     <form method="POST" action="{% url "message_create" %}?next={% url "today" %}">
         {% csrf_token %}
         <label for="body">Quick (plain) message:</label>
-        <input type="text" name="body" autofocus="html5"></input>
+        <input type="text" name="body"{% if not object_list %} autofocus="html5"{% endif %}></input>
         <input type="submit" value="plain"></input>
     </form>
     <ol>
       {% if not object_list.0.hide %}
-        {% include "transit/_message_preview.html" with object=object_list|first %}
+        {% include "transit/_message_preview.html" with object=object_list|first top_post=True %}
       {% endif %}
       {% if not object_list.1.hide %}
         {% include "transit/_message_preview.html" with object=object_list.1 %}

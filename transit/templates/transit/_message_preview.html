@@ -8,9 +8,11 @@
 {% endblock detail_link %}
 {% block metadata %}
     {{ block.super }}
+   {% if small %}
     {% if object.pk %}
         (<a href="{% url "reply" object.pk %}">reply</a>)
     {% endif %}
+   {% endif %}
     {% if hide_pk and object.pk %}
         (<a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">hide</a>)
     {% endif %}
@@ -33,3 +35,26 @@
             {{ object.parent.get_body_preview }}</a>
     {% endif %}
 {% endblock metadata %}
+{% block message_body %}
+    {% block before_message %}
+        {% if not small %}
+            {% block reply_form %}
+                {% if object.pk %}
+                    <form method="POST" action="{% url "reply" object.pk%}">
+                        <label for="body">
+                            <a href="{% url "reply" object.pk %}">Reply</a>:
+                        </label>
+                        {% if big %}
+                            <br />
+                            <textarea name="body"{% if top_post %} autofocus="html5"{% endif %}></textarea>
+                        {% else %}
+                            <input type="text" name="body"{% if top_post %} autofocus="html5"{% endif %}></input>
+                        {% endif %}
+                        <input type="submit" value="Reply"></input>
+                    </form>
+                {% endif %}
+            {% endblock reply_form %}
+        {% endif %}
+    {% endblock before_message %}
+    {{ block.super }}
+{% endblock message_body %}
