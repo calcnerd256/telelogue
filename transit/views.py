@@ -175,20 +175,21 @@ def fail_with(fallback):
     return result
 
 
-class TodayView(PageTitleMixin, ListView):
+class EnhancedMessageMixin(PageTitleMixin):
     model = ChatMessage
-    page_title = "Today's messages"
-    template_name = "transit/today.html"
-
-    @fail_with([])
-    def get_sticky_messages(self):
-        sticky = Triple.edges.lookup_semantic("sticky")
-        stickings = sticky.source_set.all()
-        stickers = (edge.path for edge in stickings if edge.current_value() is not None)
-        result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
-        return result.order_by("timestamp")
+    def get_context_data(self, *args, **kwargs):
+        context = super(EnhancedMessageMixin, self).get_context_data(*args, **kwargs)
+        hidden = Triple.lookup_semantic("hide")
+        context["hide_pk"] = hidden.pk if hidden else None
+        context["this_page"] = self.request.path
+        stick = Triple.lookup_semantic("sticky")
+        context["sticky_pk"] = stick.pk if stick else None
+        if "object_list" in context:
+            context["object_list"] = map(self.enhance_message, context["object_list"])
+        return context
 
     def enhance_message(self, message):
+        if hasattr(message, "enhanced"): return message
         hidden = Triple.lookup_semantic("hide")
         if hidden is not None:
             message.hide = Triple.lookup(hidden, message)
@@ -212,7 +213,21 @@ class TodayView(PageTitleMixin, ListView):
                             "pk": message.tag.pk,
                             "get_body_preview": "a reply",
                         }
+        message.enhanced = True
         return message
+
+
+class TodayView(EnhancedMessageMixin, ListView):
+    page_title = "Today's messages"
+    template_name = "transit/today.html"
+
+    @fail_with([])
+    def get_sticky_messages(self):
+        sticky = Triple.edges.lookup_semantic("sticky")
+        stickings = sticky.source_set.all()
+        stickers = (edge.path for edge in stickings if edge.current_value() is not None)
+        result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
+        return result.order_by("timestamp")
 
     def get_queryset(self):
         qs = super(TodayView, self).get_queryset()
@@ -220,20 +235,11 @@ class TodayView(PageTitleMixin, ListView):
         yesterday = today - datetime.timedelta(1)
         yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
         result = qs.filter(timestamp__gte=yesterday_midnight)
-        result = result.order_by("-timestamp")
-        result = (self.enhance_message(message) for message in result)
-        return result
+        return result.order_by("-timestamp")
 
     def get_context_data(self, *args, **kwargs):
         context = super(TodayView, self).get_context_data(*args, **kwargs)
-        hidden = Triple.lookup_semantic("hide")
-        context["hide_pk"] = hidden.pk if hidden else None
-        context["this_page"] = self.request.path
-        stick = Triple.lookup_semantic("sticky")
-        context["sticky_pk"] = stick.pk if stick else None
         context["sticky_posts"] = map(self.enhance_message, self.get_sticky_messages())
-        # force the generator so that I can reuse its results
-        context["object_list"] = list(context["object_list"])
         return context
 
 
@@ -322,7 +328,7 @@ class ChatMessageDetailView(PageTitleMixin, DetailView):
         return context
 
 
-class ReplyView(PageTitleMixin, NextOnSuccessMixin, CreateView):
+class ReplyView(EnhancedMessageMixin, NextOnSuccessMixin, CreateView):
     model = ChatMessage
     template_name = "transit/reply.html"
 
@@ -362,6 +368,6 @@ class ReplyView(PageTitleMixin, NextOnSuccessMixin, CreateView):
         context = super(ReplyView, self).get_context_data(*args, **kwargs)
         parent = self.get_parent()
         context["parent"] = parent
-        context["ancestors"] = Triple.util.get_ancestors(parent)
-        context["object_list"] = self.get_siblings()
+        context["ancestors"] = map(self.enhance_message, Triple.util.get_ancestors(parent))
+        context["object_list"] = map(self.enhance_message, self.get_siblings())
         return context
