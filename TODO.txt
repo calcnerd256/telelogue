@@ -1,6 +1,7 @@
 Definitely, and soon
 --------------------
 Login screen
+favicon (use github identicon)
 
 Big features
 ------------
