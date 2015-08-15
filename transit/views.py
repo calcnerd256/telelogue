@@ -360,6 +360,8 @@ class ReplyView(PageTitleMixin, NextOnSuccessMixin, CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ReplyView, self).get_context_data(*args, **kwargs)
-        context["parent"] = self.get_parent()
+        parent = self.get_parent()
+        context["parent"] = parent
+        context["ancestors"] = Triple.util.get_ancestors(parent)
         context["object_list"] = self.get_siblings()
         return context
