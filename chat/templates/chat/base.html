@@ -2,6 +2,9 @@
     <head>
         {% block title %}
             <title>
+                {% if not title_override %}
+                    Telelogue{% if page_title %}:{% endif %}
+                {% endif %}
                 {{ page_title }}
             </title>
         {% endblock title %}
