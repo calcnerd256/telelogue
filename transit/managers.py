@@ -1,8 +1,48 @@
+from types import MethodType
 from django.db import models
 
 
 class SilentLookupFailure(Exception):
     pass
+
+
+class Decorum(object):
+    decorated = None
+    def __init__(self, decorated):
+        self.decorated = decorated
+
+    __get__ = MethodType
+
+    def before_call(self, *args, **kwargs):
+        return self.decorated, args, kwargs
+
+    def after_call(self, result):
+        return result
+
+    def call(self, fn, args, kwargs):
+        return fn(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return self.after_call(
+            self.call(
+                *self.before_call(
+                    *args,
+                    **kwargs
+                )
+            )
+        )
+
+
+class FailSilently(Decorum):
+    failure_class = SilentLookupFailure
+    default_value = None
+    def call(self, *args, **kwargs):
+        try:
+            return super(FailSilently, self).call(*args, **kwargs)
+        except Exception as e:
+            if not isinstance(e, self.failure_class):
+                raise
+            return self.default_value
 
 
 class EdgeManager(models.Manager):
@@ -77,3 +117,13 @@ class TransitManager(models.Manager):
         except SilentLookupFailure:
             pass
         return result
+
+    def get_ancestors(self, child, stop_on=None):
+        if stop_on is None: stop_on = []
+        if child in stop_on: return []
+        edges = self.model.edges
+        reply = edges.lookup_semantic("reply")
+        parent = FailSilently(edges.lookup)(reply, child)
+        result = [child]
+        if parent is None: return result
+        return self.get_ancestors(parent, result + stop_on) + result

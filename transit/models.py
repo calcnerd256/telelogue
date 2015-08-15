@@ -1,4 +1,3 @@
-from types import MethodType
 import warnings
 from django.db import models
 from cuser.fields import CurrentUserField
@@ -8,6 +7,8 @@ from .managers import (
     EdgeManager,
     SilentLookupFailure,
     TransitManager,
+    Decorum,
+    FailSilently,
 )
 
 
@@ -51,45 +52,6 @@ lookup_semantics = {
     "five": ("successor", "four"),
     "reply tag": ("featurebag", "five"),
 }
-
-
-class Decorum(object):
-    decorated = None
-    def __init__(self, decorated):
-        self.decorated = decorated
-
-    __get__ = MethodType
-
-    def before_call(self, *args, **kwargs):
-        return self.decorated, args, kwargs
-
-    def after_call(self, result):
-        return result
-
-    def call(self, fn, args, kwargs):
-        return fn(*args, **kwargs)
-
-    def __call__(self, *args, **kwargs):
-        return self.after_call(
-            self.call(
-                *self.before_call(
-                    *args,
-                    **kwargs
-                )
-            )
-        )
-
-
-class FailSilently(Decorum):
-    failure_class = SilentLookupFailure
-    default_value = None
-    def call(self, *args, **kwargs):
-        try:
-            return super(FailSilently, self).call(*args, **kwargs)
-        except Exception as e:
-            if not isinstance(e, self.failure_class):
-                raise
-            return self.default_value
 
 
 class Listify(Decorum):
