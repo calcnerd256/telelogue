@@ -25,7 +25,7 @@ from .models import (
     FailSilently,
 )
 from chat.models import ChatMessage
-from chat.views import MessageListView
+from chat.views import PageTitleMixin, MessageListView
 
 # this app's imports
 
@@ -48,8 +48,9 @@ class NextOnSuccessMixin(object):
         return super(NextOnSuccessMixin, self).get_success_url()
 
 
-class CreateFromThreeMessagesView(NextOnSuccessMixin, CreateView):
+class CreateFromThreeMessagesView(PageTitleMixin, NextOnSuccessMixin, CreateView):
     model = Triple
+    page_title = 'Create triple'
     template_name = "transit/triple/create/from_messages.html"
     success_url = reverse_lazy("untagged_messages")
     message_names = "source path destination".split(" ")
@@ -150,6 +151,7 @@ class UntaggedMessagesView(MessageListView):
         self.annotate_objects(context["object_list"])
         return context
 
+
 class TaggedMessagesView(DetailView):
     model = ChatMessage
     template_name = "transit/tag/tagged_messages.html"
@@ -173,8 +175,9 @@ def fail_with(fallback):
     return result
 
 
-class TodayView(ListView):
+class TodayView(PageTitleMixin, ListView):
     model = ChatMessage
+    page_title = "Today's messages"
     template_name = "transit/today.html"
 
     @fail_with([])
@@ -209,7 +212,6 @@ class TodayView(ListView):
                             "pk": message.tag.pk,
                             "get_body_preview": "a reply",
                         }
-
         return message
 
     def get_queryset(self):
@@ -234,8 +236,10 @@ class TodayView(ListView):
         context["object_list"] = list(context["object_list"])
         return context
 
-class ChatMessageDetailView(DetailView):
+
+class ChatMessageDetailView(PageTitleMixin, DetailView):
     model = ChatMessage
+    page_title = 'Message details (transit)'
     template_name = "transit/message_detail.html"
 
     def get_sources(self):
@@ -318,9 +322,13 @@ class ChatMessageDetailView(DetailView):
         return context
 
 
-class ReplyView(NextOnSuccessMixin, CreateView):
+class ReplyView(PageTitleMixin, NextOnSuccessMixin, CreateView):
     model = ChatMessage
     template_name = "transit/reply.html"
+
+    def get_page_title(self):
+        parent = self.get_parent()
+        return 'Reply to "%s"' % parent.get_body_preview()
 
     def get_parent(self):
         pk = self.kwargs.get("parent")
