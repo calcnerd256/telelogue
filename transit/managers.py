@@ -52,18 +52,20 @@ class TransitManager(models.Manager):
     def lookup_natural(self, n, cache=[]):
         n = int(n)  # just try me; I dare you
         edges = self.model.edges
-        if n == 0: return edges.lookup_semantic("zero")
         if n < 0:
             raise SilentLookupFailure()
         if n < len(cache): return cache[n]
+        if 0 == n:
+            cache.append(edges.lookup_semantic("zero"))
+            return cache[n]
         successor = edges.lookup_semantic("successor")
         previous = self.lookup_natural(n - 1)  # recursive
         if previous is None:
             raise SilentLookupFailure()
+        result = edges.lookup(successor, previous)
         if n == len(cache):
             # this will always be true by this point
-            cache.append(previous)
-        result = cls.edges.lookup(successor, previous)
+            cache.append(result)
         # the above used to fail silently, but now it cascades its failure
         try:
             _type = edges.lookup_semantic("type")
