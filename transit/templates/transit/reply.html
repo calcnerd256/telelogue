@@ -1,0 +1,10 @@
+{% extends "chat/chatmessage_form.html" %}
+{% block content %}
+    {% include "transit/_message_preview.html" with object=parent %}
+    {{ block.super }}
+    <ul>
+        {% for object in object_list %}
+            {% include "transit/_message_preview.html" %}
+        {% endfor %}
+    </ul>
+{% endblock content %}
