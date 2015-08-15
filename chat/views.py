@@ -11,6 +11,17 @@ from models import ChatMessage
 from forms import MessageSearchForm
 
 
+class PageTitleMixin(object):
+    page_title = None
+
+    def get_context_data(self, **kwargs):
+        if self.page_title is None:
+            raise NotImplementedError("Specify a page_title if you use PageTitleMixin.")
+        context = super(PageTitleMixin, self).get_context_data(**kwargs)
+        context['page_title'] = self.page_title
+        return context
+
+
 class ChatHomeView(TemplateView):
     template_name = 'chat/home.html'
 
