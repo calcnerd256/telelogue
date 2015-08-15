@@ -14,11 +14,16 @@ from forms import MessageSearchForm
 class PageTitleMixin(object):
     page_title = None
 
+    def get_page_title(self):
+        """
+        Can be overridden if you want more specific behavior,
+        like basing the title off of self.get_object().
+        """
+        return self.page_title
+
     def get_context_data(self, **kwargs):
-        if self.page_title is None:
-            raise NotImplementedError("Specify a page_title if you use PageTitleMixin.")
         context = super(PageTitleMixin, self).get_context_data(**kwargs)
-        context['page_title'] = self.page_title
+        context['page_title'] = self.get_page_title()
         return context
 
 
@@ -54,7 +59,9 @@ class MessageDetailView(PageTitleMixin, DetailView):
 
 class UserDetailView(PageTitleMixin, DetailView):
     model = User
-    page_title = 'User details'
+
+    def get_page_title(self):
+        return 'Details for user "%s"' % self.get_object()
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
