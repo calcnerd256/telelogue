@@ -2,16 +2,25 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from .views import (
+    TodayView as Today,
     UnmetSemanticsView,
     CreateFromThreeMessagesView,
     UntaggedMessagesView,
     TaggedMessagesView,
+    ChatMessageDetailView,
 )
 
 admin.autodiscover()
 
 urlpatterns = patterns(
     "",
+    url(
+        r'^chat/today/$',
+        login_required(
+            Today.as_view()
+        ),
+        name="today",
+    ),
     url(
         r'^semantic/fringe/$',
         login_required(
@@ -38,6 +47,13 @@ urlpatterns = patterns(
         login_required(
             TaggedMessagesView.as_view()
         ),
-        name="tagged_messages"
+        name="tagged_messages",
+    ),
+    url(
+        r'^message/(?P<pk>\d+)/detail/$',
+        login_required(
+            ChatMessageDetailView.as_view()
+        ),
+        name="transit_message_detail"
     ),
 )
