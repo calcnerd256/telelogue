@@ -57,6 +57,16 @@ class MessageDetailView(PageTitleMixin, DetailView):
     model = ChatMessage
     page_title = 'Message details'
 
+class MessageExportView(ListView):
+    model = ChatMessage
+    paginate_by = 64
+    template_name = "chat/chatmessage_list.html"
+    def get_template_names(self):
+        fallbacks = super(MessageExportView, self).get_template_names()
+        requested_name = self.kwargs.get("template", "default")
+        result = ["export/chat/chatmessage_list.%s" % requested_name]
+        return result + fallbacks
+
 
 class UserDetailView(PageTitleMixin, DetailView):
     model = User

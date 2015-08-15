@@ -8,6 +8,11 @@ class ChatMessageExportMixin(object):
         u = unicode(self.body)
         return [ord(point) for point in u]
 
+    def get_body_serial(self):
+        codepoints = self.get_body_codepoints()
+        hexpoints = ["%X" % n for n in codepoints]
+        return " ".join(hexpoints)
+
     def get_body_preview(self):
         #ASCII-safe
         points = self.get_body_codepoints()
