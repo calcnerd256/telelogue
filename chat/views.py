@@ -27,8 +27,9 @@ class ChatHomeView(PageTitleMixin, TemplateView):
     template_name = 'chat/home.html'
 
 
-class MessageCreateView(CreateView):
+class MessageCreateView(PageTitleMixin, CreateView):
     model = ChatMessage
+    page_title = 'New message'
 
     def get_success_url(self):
         url = self.request.GET.get("next")
@@ -36,8 +37,9 @@ class MessageCreateView(CreateView):
         return super(MessageCreateView, self).get_success_url()
 
 
-class MessageListView(ListView):
+class MessageListView(PageTitleMixin, ListView):
     model = ChatMessage
+    page_title = 'Message log'
     paginate_by = 20
 
     def get_queryset(self):
@@ -45,12 +47,14 @@ class MessageListView(ListView):
         return qs.order_by("-timestamp")
 
 
-class MessageDetailView(DetailView):
+class MessageDetailView(PageTitleMixin, DetailView):
     model = ChatMessage
+    page_title = 'Message details'
 
 
-class UserDetailView(DetailView):
+class UserDetailView(PageTitleMixin, DetailView):
     model = User
+    page_title = 'User details'
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
@@ -66,8 +70,9 @@ class UserDetailView(DetailView):
         return context
 
 
-class MessageSearchView(FormView):
+class MessageSearchView(PageTitleMixin, FormView):
     form_class = MessageSearchForm
+    page_title = 'Message search'
     template_name = 'chat/message_search.html'
 
     def __init__(self):
