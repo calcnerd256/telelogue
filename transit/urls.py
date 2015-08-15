@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .views import (
     UnmetSemanticsView,
     CreateFromThreeMessagesView,
+    UntaggedMessagesView,
+    TaggedMessagesView,
 )
 
 admin.autodiscover()
@@ -23,5 +25,19 @@ urlpatterns = patterns(
             CreateFromThreeMessagesView.as_view()
         ),
         name="create_from_three_messages",
+    ),
+    url(
+        r'^message/untagged/list/$',
+        login_required(
+            UntaggedMessagesView.as_view()
+        ),
+        name="untagged_messages",
+    ),
+    url(
+        r'^message/tag/(?P<pk>\d+)/$',
+        login_required(
+            TaggedMessagesView.as_view()
+        ),
+        name="tagged_messages"
     ),
 )
