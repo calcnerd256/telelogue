@@ -183,7 +183,7 @@ class TodayView(ListView):
     def get_sticky_messages(self):
         sticky = Triple.lookup_semantic("sticky")
         if sticky is None:
-            return None
+            return []
         stickings = sticky.source_set.all()
         stickers = (edge.path for edge in stickings if edge.current_value() is not None)
         result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
