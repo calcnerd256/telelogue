@@ -38,7 +38,8 @@ class MessageCreateView(PageTitleMixin, CreateView):
 
     def get_success_url(self):
         url = self.request.GET.get("next")
-        if url is not None: return url
+        if url is not None:
+            return url
         return super(MessageCreateView, self).get_success_url()
 
 
@@ -67,12 +68,12 @@ class UserDetailView(PageTitleMixin, DetailView):
         context = super(UserDetailView, self).get_context_data(**kwargs)
         user_messages = self.get_object().chatmessage_set.all()
         context.update(
-          {
-            'todo_messages': user_messages.filter(body__icontains='TODO'),
-            'message_count': user_messages.count(),
-            'HILY_count': user_messages.filter(body__contains='HILY').count(),
-            'HGWILY_count': user_messages.filter(body__contains='HGWILY').count(),
-          }
+            {
+                'todo_messages': user_messages.filter(body__icontains='TODO'),
+                'message_count': user_messages.count(),
+                'HILY_count': user_messages.filter(body__contains='HILY').count(),
+                'HGWILY_count': user_messages.filter(body__contains='HGWILY').count(),
+            }
         )
         return context
 
@@ -90,9 +91,8 @@ class MessageSearchView(PageTitleMixin, FormView):
         if 'search' in request.GET:
             self.qs = ChatMessage.objects.all() # yay monkeypatching
             substr = request.GET.get('body_substring')
-            if substr: # could be ''
+            if substr:  # could be ''
                 self.qs = self.qs.filter(body__icontains=substr)
-
             self.qs = self.qs.order_by('-timestamp')
         return super(MessageSearchView, self).get(self, request, *args, **kwargs)
 
