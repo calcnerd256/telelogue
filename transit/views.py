@@ -318,7 +318,7 @@ class ChatMessageDetailView(DetailView):
         return context
 
 
-class ReplyView(CreateView):
+class ReplyView(NextOnSuccessMixin, CreateView):
     model = ChatMessage
     template_name = "transit/reply.html"
 

@@ -40,7 +40,8 @@
         {% if not small %}
             {% block reply_form %}
                 {% if object.pk %}
-                    <form method="POST" action="{% url "reply" object.pk%}">
+                    <form method="POST" action="{% url "reply" object.pk%}?next={% url "today" %}">
+                        {% csrf_token %}
                         <label for="body">
                             <a href="{% url "reply" object.pk %}">Reply</a>:
                         </label>
