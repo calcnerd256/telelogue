@@ -32,6 +32,10 @@ class Decorum(object):
             )
         )
 
+    @property
+    def __name__(self):
+        return self.decorated.__name__
+
 
 class FailSilently(Decorum):
     failure_class = SilentLookupFailure

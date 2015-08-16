@@ -186,31 +186,60 @@ def patch_on(target, rename=None):
     return result
 
 
-class EnhancedMessage(ChatMessage):
-    @patch_on(ChatMessage, "store_semantic")
+def semantic_property(fn):
+    name = fn.__name__
+    @property
     @FailSilently
-    def store_semantic(self, name, override=None):
+    def decorated(self):
+        return self.semantic_cache(fn(), name)
+    return patch_on(ChatMessage, name)(decorated)
+
+
+class EnhancedMessage(ChatMessage):
+
+    @patch_on(ChatMessage)
+    def get_cache(self):
+        if not hasattr(self, "_cache"):
+            self._cache = {}
+        return self._cache
+
+    @patch_on(ChatMessage)
+    def semantic_cache(self, name, override=None):
         if override is None: override = name
-        setattr(
-            self,
-            override,
-            Triple.lookup(Triple.edges.lookup_semantic(name), self)
-        )
+        cache = self.get_cache()
+        if override in cache: return cache[override]
+        edges = Triple.edges
+        result = edges.lookup(edges.lookup_semantic(name), self)
+        cache[override] = result
+        return result
+
+    @semantic_property
+    def hide():
+        pass
+
+    @semantic_property
+    def sticky():
+        pass
+
+    @semantic_property
+    def parent():
+        return "reply"
+
+    @patch_on(ChatMessage, "tag")
+    @property
+    @FailSilently
+    def tag(self):
+        result = self.semantic_cache("tag")
+        if result is None: return result
+        parent = self.parent
+        if parent is None: return result
+        if result == FailSilently(Triple.edges.lookup_semantic("reply_tag")):
+            result.get_body_preview = lambda *args, **kwargs: "a reply"
+        return result
 
     @patch_on(ChatMessage, "enhance")
     def enhance_message(self):
         if hasattr(self, "enhanced"): return self
-
-        map(self.store_semantic, "hide sticky tag".split(" "))
-        self.store_semantic("reply", "parent")
-        tag = getattr(self, "tag", None)
-        if tag is not None:
-            try:
-                if self.parent:
-                    if tag == Triple.edges.lookup_semantic("reply tag"):
-                        tag.get_body_preview = lambda *args, **kwargs: "a reply"
-            except SilentLookupFailure:
-                pass
         self.enhanced = True
         return self
 
