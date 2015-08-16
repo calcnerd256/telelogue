@@ -294,24 +294,29 @@ class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
     template_name = "transit/message_detail.html"
 
     def get_sources(self):
-        candidates = self.get_object().source_set.all()
-        paths = set(
+        return self.get_incidents("source", "path")
+
+    def get_incidents(self, key, other):
+        candidates = getattr(self.get_object(), "%s_set" % key).all()
+        def get_other(trip):
+            return getattr(trip, other)
+        others = set(
             [
-                trip.path.pk if trip.path is not None else 0
-                for trip
-                in candidates
+                message.pk if message is not None else 0
+                for message
+                in map(get_other, candidates)
             ]
         )
         representatives = [
             [
                 trip
-                for trip
-                in candidates
-                if (trip.path is not None and trip.path.pk == pk)
-                or (trip.path is None and pk == 0)
+                for trip, message
+                in zip(candidates, map(get_other, candidates))
+                if (message is not None and message.pk == pk)
+                or (message is None and pk == 0)
             ][0]
             for pk
-            in paths
+            in others
         ]
         return [
             {
@@ -324,34 +329,7 @@ class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
         ]
 
     def get_paths(self):
-        candidates = self.get_object().path_set.all()
-        sources = set(
-            [
-                trip.source.pk if trip.source is not None else 0
-                for trip
-                in candidates
-            ]
-        )
-        representatives = [
-            [
-                trip
-                for trip
-                in candidates
-                if (trip.source is not None and trip.source.pk == pk)
-                or (trip.source is None and pk == 0)
-            ][0]
-            for pk
-            in sources
-        ]
-        return [
-            {
-                "source": t.source,
-                "path": t.path, # should be self.get_object()
-                "destination": t.current_value(),
-            }
-            for t
-            in representatives
-        ]
+        return self.get_incidents("path", "source")
 
     def get_destinations(self):
         ob = self.get_object()
