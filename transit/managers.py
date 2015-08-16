@@ -121,13 +121,3 @@ class TransitManager(models.Manager):
         except SilentLookupFailure:
             pass
         return result
-
-    def get_ancestors(self, child, stop_on=None):
-        if stop_on is None: stop_on = []
-        if child in stop_on: return []
-        edges = self.model.edges
-        reply = edges.lookup_semantic("reply")
-        parent = FailSilently(edges.lookup)(reply, child)
-        result = [child]
-        if parent is None: return result
-        return self.get_ancestors(parent, result + stop_on) + result

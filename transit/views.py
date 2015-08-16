@@ -245,7 +245,12 @@ class EnhancedMessage(ChatMessage):
 
     @patch_on(ChatMessage)
     def get_ancestors(self):
-        return Triple.util.get_ancestors(self)
+        current = self
+        result = []
+        while current is not None and current not in result:
+            result.append(current)
+            current = current.parent
+        return reversed(result)
 
 
 class EnhancedMessageMixin(PageTitleMixin):
@@ -412,8 +417,6 @@ class ReplyView(EnhancedMessageMixin, NextOnSuccessMixin, CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ReplyView, self).get_context_data(*args, **kwargs)
-        parent = self.get_parent()
-        context["parent"] = parent
-        context["ancestors"] = Triple.util.get_ancestors(parent)
+        context["parent"] = self.get_parent()
         context["object_list"] = self.get_siblings()
         return context
