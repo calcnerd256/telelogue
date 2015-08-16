@@ -176,11 +176,20 @@ def fail_with(fallback):
     return result
 
 
-def enhance_message(self):
-    if hasattr(self, "enhanced"): return self
+def patch_on(target, rename=None):
+    def result(fn):
+        name = rename
+        if name is None:
+            name = fn.__name__
+        setattr(target, name, fn)
+        return lambda *args, **kwargs: getattr(target, name)(*args, **kwargs)
+    return result
 
+
+class EnhancedMessage(ChatMessage):
+    @patch_on(ChatMessage, "store_semantic")
     @FailSilently
-    def store_semantic(name, override=None):
+    def store_semantic(self, name, override=None):
         if override is None: override = name
         setattr(
             self,
@@ -188,21 +197,22 @@ def enhance_message(self):
             Triple.lookup(Triple.edges.lookup_semantic(name), self)
         )
 
-    map(store_semantic, "hide sticky tag".split(" "))
-    store_semantic("reply", "parent")
-    tag = getattr(self, "tag", None)
-    if tag is not None:
-        try:
-            if self.parent:
-                if tag == Triple.edges.lookup_semantic("reply tag"):
-                    tag.get_body_preview = lambda *args, **kwargs: "a reply"
-        except SilentLookupFailure:
-            pass
-    self.enhanced = True
-    return self
+    @patch_on(ChatMessage, "enhance")
+    def enhance_message(self):
+        if hasattr(self, "enhanced"): return self
 
-
-ChatMessage.enhance = enhance_message
+        map(self.store_semantic, "hide sticky tag".split(" "))
+        self.store_semantic("reply", "parent")
+        tag = getattr(self, "tag", None)
+        if tag is not None:
+            try:
+                if self.parent:
+                    if tag == Triple.edges.lookup_semantic("reply tag"):
+                        tag.get_body_preview = lambda *args, **kwargs: "a reply"
+            except SilentLookupFailure:
+                pass
+        self.enhanced = True
+        return self
 
 
 class EnhancedMessageMixin(PageTitleMixin):
