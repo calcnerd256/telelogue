@@ -129,3 +129,10 @@ class Triple(models.Model):
         source = self.source
         path = self.path
         return edges.lookup(source, path, author)
+
+    def current_dict(self):
+        return {
+            "source": self.source,
+            "path": self.path,
+            "destination": self.current_value(),
+        }

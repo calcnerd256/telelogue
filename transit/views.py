@@ -298,34 +298,28 @@ class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
 
     def get_incidents(self, key, other):
         candidates = getattr(self.get_object(), "%s_set" % key).all()
-        def get_other(trip):
-            return getattr(trip, other)
-        others = set(
-            [
-                message.pk if message is not None else 0
-                for message
-                in map(get_other, candidates)
-            ]
-        )
-        representatives = [
-            [
-                trip
-                for trip, message
-                in zip(candidates, map(get_other, candidates))
-                if (message is not None and message.pk == pk)
-                or (message is None and pk == 0)
-            ][0]
-            for pk
-            in others
-        ]
+        def to_pk(trip):
+            message = getattr(trip, other)
+            if message is None: return 0
+            return message.pk
+
+        def from_pk(pk):
+            for trip in candidates:
+                if pk == to_pk(trip):
+                    return trip
+
         return [
-            {
-                "source": t.source, # should be self.get_object()
-                "path": t.path,
-                "destination": t.current_value(),
-            }
+            t.current_dict()
             for t
-            in representatives
+            in map(
+                from_pk,
+                set(
+                    map(
+                        to_pk,
+                        candidates
+                    )
+                )
+            )
         ]
 
     def get_paths(self):
