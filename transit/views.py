@@ -257,15 +257,10 @@ class EnhancedMessageMixin(PageTitleMixin):
     model = ChatMessage
     def get_context_data(self, *args, **kwargs):
         context = super(EnhancedMessageMixin, self).get_context_data(*args, **kwargs)
-        hidden = Triple.lookup_semantic("hide")
-        context["hide_pk"] = hidden.pk if hidden else None
         context["this_page"] = self.request.path
-        stick = Triple.lookup_semantic("sticky")
-        context["sticky_pk"] = stick.pk if stick else None
+        for k in "hide sticky".split(" "):
+            context["%s_pk" % k] = getattr(Triple.lookup_semantic(k), "pk", None)
         return context
-
-    def enhance_message(self, message):
-        return message
 
 
 class TodayView(EnhancedMessageMixin, ListView):
@@ -294,8 +289,7 @@ class TodayView(EnhancedMessageMixin, ListView):
         return context
 
 
-class ChatMessageDetailView(PageTitleMixin, DetailView):
-    model = ChatMessage
+class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
     page_title = 'Message details (transit)'
     template_name = "transit/message_detail.html"
 
@@ -380,7 +374,6 @@ class ChatMessageDetailView(PageTitleMixin, DetailView):
 
 
 class ReplyView(EnhancedMessageMixin, NextOnSuccessMixin, CreateView):
-    model = ChatMessage
     template_name = "transit/reply.html"
 
     def get_page_title(self):
