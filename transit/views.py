@@ -23,6 +23,7 @@ from .models import (
     lookup_semantics,
     Triple,
     FailSilently,
+    SilentLookupFailure,
 )
 from chat.models import ChatMessage
 from chat.views import PageTitleMixin, MessageListView
@@ -175,6 +176,35 @@ def fail_with(fallback):
     return result
 
 
+def enhance_message(self):
+    if hasattr(self, "enhanced"): return self
+
+    @FailSilently
+    def store_semantic(name, override=None):
+        if override is None: override = name
+        setattr(
+            self,
+            override,
+            Triple.lookup(Triple.edges.lookup_semantic(name), self)
+        )
+
+    map(store_semantic, "hide sticky tag".split(" "))
+    store_semantic("reply", "parent")
+    tag = getattr(self, "tag", None)
+    if tag is not None:
+        try:
+            if self.parent:
+                if tag == Triple.edges.lookup_semantic("reply tag"):
+                    tag.get_body_preview = lambda *args, **kwargs: "a reply"
+        except SilentLookupFailure:
+            pass
+    self.enhanced = True
+    return self
+
+
+ChatMessage.enhance = enhance_message
+
+
 class EnhancedMessageMixin(PageTitleMixin):
     model = ChatMessage
     def get_context_data(self, *args, **kwargs):
@@ -189,32 +219,7 @@ class EnhancedMessageMixin(PageTitleMixin):
         return context
 
     def enhance_message(self, message):
-        if hasattr(message, "enhanced"): return message
-        hidden = Triple.lookup_semantic("hide")
-        if hidden is not None:
-            message.hide = Triple.lookup(hidden, message)
-
-        sticky = Triple.lookup_semantic("sticky")
-        if sticky is not None:
-            message.sticky = Triple.lookup(sticky, message)
-
-        reply = Triple.lookup_semantic("reply")
-        if reply is not None:
-            message.parent = Triple.lookup(reply, message)
-
-        tag = Triple.lookup_semantic("tag")
-        if tag is not None:
-            message.tag = Triple.lookup(tag, message)
-            reply_tag = Triple.lookup_semantic("reply tag")
-            if reply_tag is not None and message.tag is not None:
-                if reply_tag.pk == message.tag.pk:
-                    if message.parent:
-                        message.tag = {
-                            "pk": message.tag.pk,
-                            "get_body_preview": "a reply",
-                        }
-        message.enhanced = True
-        return message
+        return message.enhance()
 
 
 class TodayView(EnhancedMessageMixin, ListView):
