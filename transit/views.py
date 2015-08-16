@@ -24,6 +24,7 @@ from .models import (
     Triple,
     FailSilently,
     SilentLookupFailure,
+    Listify,
 )
 from chat.models import ChatMessage
 from chat.views import PageTitleMixin, MessageListView
@@ -325,17 +326,15 @@ class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
     def get_paths(self):
         return self.get_incidents("path", "source")
 
+    @Listify
     def get_destinations(self):
         ob = self.get_object()
-        candidates = ob.destination_set.all()
-        return [
-            edge
-            for edge
-            in candidates
-            if (
-                lambda d: d is not None and d.pk == ob.pk
-            )(edge.current_value())
-        ]
+        pk = ob.pk
+        for edge in ob.destination_set.all():
+            d = edge.current_value()
+            if d is not None:
+                if pk == d.pk:
+                    yield edge
 
     def get_context_data(self, *args, **kwargs):
         context = super(ChatMessageDetailView, self).get_context_data(*args, **kwargs)
