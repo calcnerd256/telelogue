@@ -8,11 +8,11 @@
 {% endblock detail_link %}
 {% block metadata %}
     {{ block.super }}
-   {% if small %}
-    {% if object.pk %}
+    {% if small %}
+      {% if object.pk %}
         (<a href="{% url "reply" object.pk %}">reply</a>)
+      {% endif %}
     {% endif %}
-   {% endif %}
     {% if hide_pk and object.pk %}
         (<a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">hide</a>)
     {% endif %}

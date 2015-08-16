@@ -191,7 +191,7 @@ def semantic_property(fn):
     @property
     @FailSilently
     def decorated(self):
-        return self.semantic_cache(fn(), name)
+        return self.semantic_cache(name, fn())
     return patch_on(ChatMessage, name)(decorated)
 
 
@@ -204,13 +204,13 @@ class EnhancedMessage(ChatMessage):
         return self._cache
 
     @patch_on(ChatMessage)
-    def semantic_cache(self, name, override=None):
-        if override is None: override = name
+    def semantic_cache(self, lookup, semantic=None):
+        if semantic is None: semantic = lookup
         cache = self.get_cache()
-        if override in cache: return cache[override]
+        if lookup in cache: return cache[lookup]
         edges = Triple.edges
-        result = edges.lookup(edges.lookup_semantic(name), self)
-        cache[override] = result
+        result = edges.lookup(edges.lookup_semantic(semantic), self)
+        cache[lookup] = result
         return result
 
     @semantic_property
@@ -237,11 +237,15 @@ class EnhancedMessage(ChatMessage):
             result.get_body_preview = lambda *args, **kwargs: "a reply"
         return result
 
-    @patch_on(ChatMessage, "enhance")
-    def enhance_message(self):
+    @patch_on(ChatMessage)
+    def enhance(self):
         if hasattr(self, "enhanced"): return self
         self.enhanced = True
         return self
+
+    @patch_on(ChatMessage)
+    def get_ancestors(self):
+        return Triple.util.get_ancestors(self)
 
 
 class EnhancedMessageMixin(PageTitleMixin):
@@ -253,12 +257,10 @@ class EnhancedMessageMixin(PageTitleMixin):
         context["this_page"] = self.request.path
         stick = Triple.lookup_semantic("sticky")
         context["sticky_pk"] = stick.pk if stick else None
-        if "object_list" in context:
-            context["object_list"] = map(self.enhance_message, context["object_list"])
         return context
 
     def enhance_message(self, message):
-        return message.enhance()
+        return message
 
 
 class TodayView(EnhancedMessageMixin, ListView):
@@ -283,7 +285,7 @@ class TodayView(EnhancedMessageMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(TodayView, self).get_context_data(*args, **kwargs)
-        context["sticky_posts"] = map(self.enhance_message, self.get_sticky_messages())
+        context["sticky_posts"] = self.get_sticky_messages()
         return context
 
 
@@ -412,6 +414,6 @@ class ReplyView(EnhancedMessageMixin, NextOnSuccessMixin, CreateView):
         context = super(ReplyView, self).get_context_data(*args, **kwargs)
         parent = self.get_parent()
         context["parent"] = parent
-        context["ancestors"] = map(self.enhance_message, Triple.util.get_ancestors(parent))
-        context["object_list"] = map(self.enhance_message, self.get_siblings())
+        context["ancestors"] = Triple.util.get_ancestors(parent)
+        context["object_list"] = self.get_siblings()
         return context

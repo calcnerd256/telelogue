@@ -2,7 +2,7 @@
 {% block content %}
     <h1>Reply to thread</h1>
     <ol>
-      {% for ancestor in ancestors %}
+      {% for ancestor in parent.get_ancestors %}
         {% include "transit/_message_preview.html" with object=ancestor %}
       {% endfor %}
     </ol>
