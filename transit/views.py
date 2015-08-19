@@ -14,6 +14,7 @@ from django.views.generic.detail import (
     SingleObjectMixin,
     _,
     Http404,
+    models,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -211,31 +212,23 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
         )
 
 
-class TaggedMessagesView(EnhancedMessageMixin, SingleObjectMixin, TemplateView):
+class TaggedMessagesView(EnhancedMessageMixin, TemplateView):
     template_name = "transit/tag/tagged_messages.html"
     page_title = "Tagged Messages"  # TODO: make this that helper method
-    queryset = None
-    context_object_name = None
     pk_url_kwarg = "pk"
 
     def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        pk = self.kwargs.get(self.pk_url_kwarg)
-        if pk is not None:
-            queryset = queryset.filter(pk=pk)
-        else:
-            error_template = "Detail view %s must be called with an object pk."
-            raise AttributeError(error_template % self.__class__.__name__)
-        try:
-            return queryset.get()
-        except queryset.model.DoesNotExist:
-            error_template = _("No %(verbose_name)s found matching the query")
-            raise Http404(
-                error_template % {
-                    'verbose_name': queryset.model._meta.verbose_name
-                }
-            )
+        return get_object_or_404(
+            self.model,
+            pk=int(self.kwargs.get(self.pk_url_kwarg))
+        )
+
+    def get_context_object_name(self, obj):
+        if not isinstance(obj, models.Model):
+            return None
+        if self.object._deferred:
+            obj = obj._meta.proxy_for_model
+        return obj._meta.object_name.lower()
 
     def get_tagged_messages(self):
         tag = self.get_object()
@@ -252,7 +245,14 @@ class TaggedMessagesView(EnhancedMessageMixin, SingleObjectMixin, TemplateView):
         return self.render_to_response(context)
 
     def get_context_data(self, *args, **kwargs):
-        context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
+        context = {}
+        if self.object:
+            context["object"] = self.object
+            context_object_name = self.get_context_object_name(self.object)
+            if context_object_name:
+                context[context_object_name] = self.object
+        context.update(**kwargs)
+        context = super(TaggedMessagesView, self).get_context_data(*args, **context)
         context["object_list"] = self.get_tagged_messages()
         return context
 
