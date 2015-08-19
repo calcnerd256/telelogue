@@ -5,8 +5,13 @@ import datetime
 from django.db.models import Q
 from django.views.generic import (
     CreateView,
-    DetailView,
     ListView,
+    TemplateView,
+)
+from django.views.generic.detail import (
+    DetailView,
+    TemplateResponseMixin,
+    SingleObjectMixin,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -158,17 +163,18 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
                 raise
 
     def get_query_filter(self, efficient=True):
+        tag = self.get_tag("aggressive")
+        taggings = tag.source_set.all()
         if not efficient:
             # TODO: make this fast, perhaps by inlining t.current_value()
             return ~Q(
                 id__in=[
                     t.path_id
                     for t
-                    in self.get_tag("aggressive").source_set.all()
+                    in taggings
                     if t.current_value() is not None
                 ]
             )
-        taggings = self.get_tag("aggressive").source_set.all()
         removed = Q(
             pk__in=[
                 t.path
@@ -183,11 +189,15 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
     @super_then(lambda: UntaggedMessagesView)
     @FailSilently
     def get_queryset(self, result):
-        return result.filter(self.get_query_filter()).order_by("timestamp")
+        return result.filter(
+            self.get_query_filter()
+        ).order_by("timestamp")
 
     @FailSilently
     def get_tags(self):
-        return list(Triple.util.get_tags())
+        return list(
+            Triple.util.get_tags()
+        )
 
     @super_then(lambda: UntaggedMessagesView)
     def get_context_data(self, context):
@@ -199,7 +209,7 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
         )
 
 
-class TaggedMessagesView(EnhancedMessageMixin, DetailView):
+class TaggedMessagesView(EnhancedMessageMixin, SingleObjectMixin, TemplateView):
     template_name = "transit/tag/tagged_messages.html"
     page_title = "Tagged Messages"  # TODO: make this that helper method
 
@@ -211,6 +221,11 @@ class TaggedMessagesView(EnhancedMessageMixin, DetailView):
         edges = potential_edges.filter(source=tag_tag)
         pks = edges.values_list("path", flat=True)
         return self.model.objects.filter(pk__in=pks)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object, **kwargs)
+        return self.render_to_response(context)
 
     def get_context_data(self, *args, **kwargs):
         context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
