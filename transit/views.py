@@ -145,18 +145,46 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
     template_name="transit/untagged_messages.html"
     page_title = "Untagged Messages"
 
+    def get_tag(self, cascade=True):
+        try:
+            result = Triple.edges.lookup_semantic("tag")
+            if result is not None:
+                return result
+            if "aggressive" == cascade:
+                raise SilentFailure()
+            return result
+        except SilentFailure:
+            if cascade:
+                raise
+
+    def get_taggings(self):
+        return self.get_tag("aggressive").source_set.all()
+
+    def get_never_tagged_query(self, taggings=None):
+        if taggings is None: taggings = self.get_taggings()
+        return ~Q(pk__in=taggings.values("path"))
+
+    def get_removed_tags_query(self, taggings=None):
+        if taggings is None: taggings = self.get_taggings()
+        return Q(
+            pk__in=[
+                t.path
+                for t
+                in taggings.filter(destination__isnull=True)
+                if t.current_value() is None
+            ]
+        )
+
+    def get_query_filter(self):
+        taggings = self.get_taggings()
+        removed = self.get_removed_tags_query(taggings)
+        never = self.get_never_tagged_query(taggings)
+        return removed|never
+
     @super_then(lambda: UntaggedMessagesView)
     @FailSilently
-    def get_queryset(self, qs):
-        tag = Triple.edges.lookup_semantic("tag")
-        if tag is None:
-            raise SilentLookupFailure()
-        taggings = Triple.objects.filter(source=tag)
-        tagged = taggings.values("path")
-        tag_removed = taggings.filter(destination__isnull=True).values("path")
-        query = Q(pk__in=tag_removed)|~Q(pk__in=tagged)
-        candidates = qs.filter(query)
-        return candidates.order_by("timestamp")
+    def get_queryset(self, result):
+        return result.filter(self.get_query_filter()).order_by("timestamp")
 
     @FailSilently
     def get_tags(self):
@@ -167,7 +195,7 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
         context.update(
             {
                 "tags": self.get_tags(),
-                "tag_tag": FailSilently(Triple.edges.lookup_semantic)("tag"),
+                "tag_tag": self.get_tag(False),
             }
         )
 
