@@ -1,4 +1,7 @@
 {% extends "chat/chatmessage_list.html" %}
 {% block before_list %}
-    {% include "chat/_message_preview.html" %}
+    {% include "transit/_message_preview.html" %}
 {% endblock before_list %}
+{% block item %}
+    {% include "transit/_message_preview.html" %}
+{% endblock item %}
