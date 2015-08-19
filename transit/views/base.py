@@ -81,3 +81,9 @@ class ObjectAndListView(ListView):
             context[context_object_name] = self.object
         context.update(**kwargs)
         return super(ObjectAndListView, self).get_context_data(*args, **context)
+
+
+def fail_with(fallback):
+    class result(FailSilently):
+        default_value = fallback
+    return result

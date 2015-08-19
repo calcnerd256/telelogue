@@ -10,6 +10,8 @@ from ..models import (
 from .base import (
     EnhancedViewMixin,
     super_then,
+    EnhancedMessageMixin,
+    ObjectAndListView,
 )
 
 
@@ -74,3 +76,17 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
                 "tag_tag": self.get_tag(False),
             }
         )
+
+
+class TaggedMessagesView(EnhancedMessageMixin, ObjectAndListView):
+    template_name = "transit/tag/tagged_messages.html"
+    page_title = "Tagged Messages"  # TODO: make this that helper method
+
+    def get_queryset(self):
+        tag = self.get_object()
+        tag_tag = Triple.lookup_semantic("tag")
+        potential_edges = tag.destination_set
+        if not tag_tag: return [e.path for e in potential_edges]
+        edges = potential_edges.filter(source=tag_tag)
+        pks = edges.values_list("path", flat=True)
+        return self.model.objects.filter(pk__in=pks)

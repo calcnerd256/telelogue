@@ -49,59 +49,17 @@ from .base import (
     EnhancedViewMixin,
     EnhancedMessageMixin,
     ObjectAndListView,
+    fail_with,
 )
 
 # importing views
 from .triple import CreateFromThreeMessagesView
 from .semantics import UnmetSemanticsView
-from .tag import UntaggedMessagesView
-
-
-def fail_with(fallback):
-    class result(FailSilently):
-        default_value = fallback
-    return result
-
-
-class TaggedMessagesView(EnhancedMessageMixin, ObjectAndListView):
-    template_name = "transit/tag/tagged_messages.html"
-    page_title = "Tagged Messages"  # TODO: make this that helper method
-    pk_url_kwarg = "pk"
-
-    def get_queryset(self):
-        tag = self.get_object()
-        tag_tag = Triple.lookup_semantic("tag")
-        potential_edges = tag.destination_set
-        if not tag_tag: return [e.path for e in potential_edges]
-        edges = potential_edges.filter(source=tag_tag)
-        pks = edges.values_list("path", flat=True)
-        return self.model.objects.filter(pk__in=pks)
-
-
-class TodayView(EnhancedMessageMixin, ListView):
-    page_title = "Today's messages"
-    template_name = "transit/today.html"
-
-    @fail_with([])
-    def get_sticky_messages(self):
-        sticky = Triple.edges.lookup_semantic("sticky")
-        stickings = sticky.source_set.all()
-        stickers = (edge.path for edge in stickings if edge.current_value() is not None)
-        result = self.model.objects.filter(pk__in=set(sticker.pk for sticker in stickers))
-        return result.order_by("timestamp")
-
-    def get_queryset(self):
-        qs = super(TodayView, self).get_queryset()
-        today = datetime.date.today()
-        yesterday = today - datetime.timedelta(1)
-        yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
-        result = qs.filter(timestamp__gte=yesterday_midnight)
-        return result.order_by("-timestamp")
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(TodayView, self).get_context_data(*args, **kwargs)
-        context["sticky_posts"] = self.get_sticky_messages()
-        return context
+from .tag import (
+    UntaggedMessagesView,
+    TaggedMessagesView,
+)
+from .today import TodayView
 
 
 class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
