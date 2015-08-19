@@ -12,6 +12,8 @@ from django.views.generic.detail import (
     DetailView,
     TemplateResponseMixin,
     SingleObjectMixin,
+    _,
+    Http404,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -212,6 +214,28 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
 class TaggedMessagesView(EnhancedMessageMixin, SingleObjectMixin, TemplateView):
     template_name = "transit/tag/tagged_messages.html"
     page_title = "Tagged Messages"  # TODO: make this that helper method
+    queryset = None
+    context_object_name = None
+    pk_url_kwarg = "pk"
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if pk is not None:
+            queryset = queryset.filter(pk=pk)
+        else:
+            error_template = "Detail view %s must be called with an object pk."
+            raise AttributeError(error_template % self.__class__.__name__)
+        try:
+            return queryset.get()
+        except queryset.model.DoesNotExist:
+            error_template = _("No %(verbose_name)s found matching the query")
+            raise Http404(
+                error_template % {
+                    'verbose_name': queryset.model._meta.verbose_name
+                }
+            )
 
     def get_tagged_messages(self):
         tag = self.get_object()
