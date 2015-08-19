@@ -20,7 +20,6 @@ from django.core.urlresolvers import (
 
 # local app imports
 from .models import (
-    lookup_semantics,
     Triple,
     FailSilently,
     SilentLookupFailure,
@@ -50,6 +49,20 @@ class NextOnSuccessMixin(object):
         return super(NextOnSuccessMixin, self).get_success_url()
 
 
+def super_then(clsfn, name=None):
+    def decoration(fn):
+        method_name = fn.__name__
+        if name is not None: method_name = name
+        def decorated(self, *args, **kwargs):
+            method = getattr(super(clsfn(), self), method_name)
+            intermediate = method(*args, **kwargs)
+            result = fn(self, intermediate)
+            if result is None: return intermediate
+            return result
+        return decorated
+    return decoration
+
+
 class CreateFromThreeMessagesView(PageTitleMixin, NextOnSuccessMixin, CreateView):
     model = Triple
     page_title = 'Create triple'
@@ -69,60 +82,55 @@ class CreateFromThreeMessagesView(PageTitleMixin, NextOnSuccessMixin, CreateView
         names = self.message_names
         return dict(zip(names, map(self.get_message, names)))
 
-    def get_initial(self, *args, **kwargs):
-        result = super(CreateFromThreeMessagesView, self).get_initial(*args, **kwargs)
+    @super_then(lambda: CreateFromThreeMessagesView)
+    def get_initial(self, result):
         result.update(self.get_messages())
-        return result
 
-    def get_form_class(self, *args, **kwargs):
-        result = super(CreateFromThreeMessagesView, self).get_form_class(*args, **kwargs)
+    @super_then(lambda: CreateFromThreeMessagesView)
+    def get_form_class(self, result):
+        # TODO: make a form that knows how to do this
         for key in self.message_names:
             result.base_fields[key].widget = HiddenInput()
-        return result
 
-    def get_context_data(self, *args, **kwargs):
-        result = super(CreateFromThreeMessagesView, self).get_context_data(*args, **kwargs)
+    @super_then(lambda: CreateFromThreeMessagesView)
+    def get_context_data(self, result):
         result.update(self.get_messages())
-        return result
 
 
 class UnmetSemanticsView(MessageListView):
     template_name = "transit/unmet_semantics.html"
 
+    @FailSilently
+    def get_candidate(self, name):
+        try:
+            Triple.edges.lookup_semantic(name)
+            return
+        except SilentLookupFailure:
+            pass
+        source, path = [
+            {
+                "name": _name,
+                "value": Triple.edges.lookup_semantic(_name)
+            }
+            for _name
+            in Triple.semantics[name][0:2]
+        ]
+        return {
+            "name": name,
+            "source": source,
+            "path": path,
+        }
+
+    @Listify
     def get_candidates(self):
-        def filter_step(name):
-            if Triple.lookup_semantic(name) is not None: return False
-            source_name, path_name = lookup_semantics[name][0:2]
-            if source_name is not None:
-                if Triple.lookup_semantic(source_name) is None:
-                    return False
-            if path_name is not None:
-                if Triple.lookup_semantic(path_name) is None:
-                    return False
-            return True
-        def map_step(name):
-            source_name, path_name = lookup_semantics[name][0:2]
-            source = {
-                "name": source_name,
-                "value": Triple.lookup_semantic(source_name),
-            }
-            path = {
-                "name": path_name,
-                "value": Triple.lookup_semantic(path_name),
-            }
-            return {
-                "name": name,
-                "source": source,
-                "path": path,
-            }
-        names = lookup_semantics.keys()
-        return map(map_step, filter(filter_step, names))
+        for name in Triple.semantics.keys():
+            candidate = self.get_candidate(name)
+            if candidate is not None:
+                yield candidate
 
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(UnmetSemanticsView, self).get_context_data(*args, **kwargs)
+    @super_then(lambda: UnmetSemanticsView)
+    def get_context_data(self, context):
         context["semantic_fringe"] = self.get_candidates()
-        return context
 
 
 class UntaggedMessagesView(MessageListView):
