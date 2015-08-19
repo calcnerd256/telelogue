@@ -136,3 +136,53 @@ class Triple(models.Model):
             "path": self.path,
             "destination": self.current_value(),
         }
+
+
+def patch_on(target, rename=None):
+    def result(fn):
+        name = rename
+        if name is None:
+            name = fn.__name__
+        setattr(target, name, fn)
+        return lambda *args, **kwargs: getattr(target, name)(*args, **kwargs)
+    return result
+
+
+def semantic_property(fn):
+    name = fn.__name__
+    @property
+    @FailSilently
+    def decorated(self):
+        return self.semantic_cache(name, fn())
+    return patch_on(ChatMessage, name)(decorated)
+
+
+class EnhancedMessage(ChatMessage):
+
+    @patch_on(ChatMessage)
+    def get_cache(self):
+        if not hasattr(self, "_cache"):
+            self._cache = {}
+        return self._cache
+
+    @patch_on(ChatMessage)
+    def semantic_cache(self, lookup, semantic=None):
+        if semantic is None: semantic = lookup
+        cache = self.get_cache()
+        if lookup in cache: return cache[lookup]
+        edges = Triple.edges
+        result = edges.lookup(edges.lookup_semantic(semantic), self)
+        cache[lookup] = result
+        return result
+
+    @semantic_property
+    def hide():
+        pass
+
+    @semantic_property
+    def sticky():
+        pass
+
+    @semantic_property
+    def parent():
+        return "reply"
