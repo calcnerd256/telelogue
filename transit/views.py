@@ -85,6 +85,90 @@ class EnhancedMessageMixin(EnhancedViewMixin):
     model = ChatMessage
 
 
+def fail_with(fallback):
+    class result(FailSilently):
+        default_value = fallback
+    return result
+
+
+def patch_on(target, rename=None):
+    def result(fn):
+        name = rename
+        if name is None:
+            name = fn.__name__
+        setattr(target, name, fn)
+        return lambda *args, **kwargs: getattr(target, name)(*args, **kwargs)
+    return result
+
+
+def semantic_property(fn):
+    name = fn.__name__
+    @property
+    @FailSilently
+    def decorated(self):
+        return self.semantic_cache(name, fn())
+    return patch_on(ChatMessage, name)(decorated)
+
+
+class EnhancedMessage(ChatMessage):
+
+    @patch_on(ChatMessage)
+    def get_cache(self):
+        if not hasattr(self, "_cache"):
+            self._cache = {}
+        return self._cache
+
+    @patch_on(ChatMessage)
+    def semantic_cache(self, lookup, semantic=None):
+        if semantic is None: semantic = lookup
+        cache = self.get_cache()
+        if lookup in cache: return cache[lookup]
+        edges = Triple.edges
+        result = edges.lookup(edges.lookup_semantic(semantic), self)
+        cache[lookup] = result
+        return result
+
+    @semantic_property
+    def hide():
+        pass
+
+    @semantic_property
+    def sticky():
+        pass
+
+    @semantic_property
+    def parent():
+        return "reply"
+
+    @patch_on(ChatMessage, "tag")
+    @property
+    @FailSilently
+    def tag(self):
+        result = self.semantic_cache("tag")
+        if result is None: return result
+        parent = self.parent
+        if parent is None: return result
+        if result == FailSilently(Triple.edges.lookup_semantic("reply_tag")):
+            result.get_body_preview = lambda *args, **kwargs: "a reply"
+        return result
+
+    @patch_on(ChatMessage)
+    def enhance(self):
+        if hasattr(self, "enhanced"): return self
+        self.enhanced = True
+        return self
+
+    @patch_on(ChatMessage)
+    def get_ancestors(self):
+        current = self
+        result = []
+        while current is not None and current not in result:
+            result.append(current)
+            current = current.parent
+        return reversed(result)
+
+
+
 class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
     model = Triple
     page_title = 'Create triple'
@@ -260,89 +344,6 @@ class TaggedMessagesView(EnhancedMessageMixin, ObjectAndListView):
         edges = potential_edges.filter(source=tag_tag)
         pks = edges.values_list("path", flat=True)
         return self.model.objects.filter(pk__in=pks)
-
-
-def fail_with(fallback):
-    class result(FailSilently):
-        default_value = fallback
-    return result
-
-
-def patch_on(target, rename=None):
-    def result(fn):
-        name = rename
-        if name is None:
-            name = fn.__name__
-        setattr(target, name, fn)
-        return lambda *args, **kwargs: getattr(target, name)(*args, **kwargs)
-    return result
-
-
-def semantic_property(fn):
-    name = fn.__name__
-    @property
-    @FailSilently
-    def decorated(self):
-        return self.semantic_cache(name, fn())
-    return patch_on(ChatMessage, name)(decorated)
-
-
-class EnhancedMessage(ChatMessage):
-
-    @patch_on(ChatMessage)
-    def get_cache(self):
-        if not hasattr(self, "_cache"):
-            self._cache = {}
-        return self._cache
-
-    @patch_on(ChatMessage)
-    def semantic_cache(self, lookup, semantic=None):
-        if semantic is None: semantic = lookup
-        cache = self.get_cache()
-        if lookup in cache: return cache[lookup]
-        edges = Triple.edges
-        result = edges.lookup(edges.lookup_semantic(semantic), self)
-        cache[lookup] = result
-        return result
-
-    @semantic_property
-    def hide():
-        pass
-
-    @semantic_property
-    def sticky():
-        pass
-
-    @semantic_property
-    def parent():
-        return "reply"
-
-    @patch_on(ChatMessage, "tag")
-    @property
-    @FailSilently
-    def tag(self):
-        result = self.semantic_cache("tag")
-        if result is None: return result
-        parent = self.parent
-        if parent is None: return result
-        if result == FailSilently(Triple.edges.lookup_semantic("reply_tag")):
-            result.get_body_preview = lambda *args, **kwargs: "a reply"
-        return result
-
-    @patch_on(ChatMessage)
-    def enhance(self):
-        if hasattr(self, "enhanced"): return self
-        self.enhanced = True
-        return self
-
-    @patch_on(ChatMessage)
-    def get_ancestors(self):
-        current = self
-        result = []
-        while current is not None and current not in result:
-            result.append(current)
-            current = current.parent
-        return reversed(result)
 
 
 class TodayView(EnhancedMessageMixin, ListView):
