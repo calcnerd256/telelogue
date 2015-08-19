@@ -157,16 +157,19 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
             if cascade:
                 raise
 
-    def get_taggings(self):
-        return self.get_tag("aggressive").source_set.all()
-
-    def get_never_tagged_query(self, taggings=None):
-        if taggings is None: taggings = self.get_taggings()
-        return ~Q(pk__in=taggings.values("path"))
-
-    def get_removed_tags_query(self, taggings=None):
-        if taggings is None: taggings = self.get_taggings()
-        return Q(
+    def get_query_filter(self, efficient=True):
+        if not efficient:
+            # TODO: make this fast, perhaps by inlining t.current_value()
+            return ~Q(
+                id__in=[
+                    t.path_id
+                    for t
+                    in self.get_tag("aggressive").source_set.all()
+                    if t.current_value() is not None
+                ]
+            )
+        taggings = self.get_tag("aggressive").source_set.all()
+        removed = Q(
             pk__in=[
                 t.path
                 for t
@@ -174,11 +177,7 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
                 if t.current_value() is None
             ]
         )
-
-    def get_query_filter(self):
-        taggings = self.get_taggings()
-        removed = self.get_removed_tags_query(taggings)
-        never = self.get_never_tagged_query(taggings)
+        never = ~Q(pk__in=taggings.values("path"))
         return removed|never
 
     @super_then(lambda: UntaggedMessagesView)
