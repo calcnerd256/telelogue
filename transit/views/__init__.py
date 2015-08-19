@@ -29,7 +29,7 @@ from django.core.urlresolvers import (
 # third-party app imports
 
 # local app imports
-from .models import (
+from ..models import (
     Triple,
     FailSilently,
     SilentLookupFailure,
