@@ -5,16 +5,18 @@ import datetime
 from django.db.models import Q
 from django.views.generic import (
     CreateView,
-    ListView,
-    TemplateView,
 )
 from django.views.generic.detail import (
     DetailView,
-    TemplateResponseMixin,
-    SingleObjectMixin,
     _,
     Http404,
     models,
+)
+from django.views.generic.base import (
+    TemplateView,
+)
+from django.views.generic.list import (
+    ListView,
 )
 from django.forms import HiddenInput
 from django.shortcuts import (
@@ -212,7 +214,7 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
         )
 
 
-class TaggedMessagesView(EnhancedMessageMixin, TemplateView):
+class TaggedMessagesView(EnhancedMessageMixin, ListView):
     template_name = "transit/tag/tagged_messages.html"
     page_title = "Tagged Messages"  # TODO: make this that helper method
     pk_url_kwarg = "pk"
@@ -223,14 +225,7 @@ class TaggedMessagesView(EnhancedMessageMixin, TemplateView):
             pk=int(self.kwargs.get(self.pk_url_kwarg))
         )
 
-    def get_context_object_name(self, obj):
-        if not isinstance(obj, models.Model):
-            return None
-        if self.object._deferred:
-            obj = obj._meta.proxy_for_model
-        return obj._meta.object_name.lower()
-
-    def get_tagged_messages(self):
+    def get_queryset(self):
         tag = self.get_object()
         tag_tag = Triple.lookup_semantic("tag")
         potential_edges = tag.destination_set
@@ -241,20 +236,28 @@ class TaggedMessagesView(EnhancedMessageMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        context = self.get_context_data(object=self.object, **kwargs)
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(
+            object=self.object,
+            object_list=self.object_list,
+            **kwargs
+        )
         return self.render_to_response(context)
 
     def get_context_data(self, *args, **kwargs):
         context = {}
         if self.object:
             context["object"] = self.object
-            context_object_name = self.get_context_object_name(self.object)
+            obj = self.object
+            context_object_name = None
+            if isinstance(obj, models.Model):
+                if self.object._deferred:
+                    obj = obj._meta.proxy_for_model
+                    context_object_name = obj._meta.object_name.lower()
             if context_object_name:
                 context[context_object_name] = self.object
         context.update(**kwargs)
-        context = super(TaggedMessagesView, self).get_context_data(*args, **context)
-        context["object_list"] = self.get_tagged_messages()
-        return context
+        return super(TaggedMessagesView, self).get_context_data(*args, **context)
 
 
 def fail_with(fallback):
