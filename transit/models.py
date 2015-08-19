@@ -140,9 +140,7 @@ class Triple(models.Model):
 
 def patch_on(target, rename=None):
     def result(fn):
-        name = rename
-        if name is None:
-            name = fn.__name__
+        name = rename if rename is not None else fn.__name__
         setattr(target, name, fn)
         return lambda *args, **kwargs: getattr(target, name)(*args, **kwargs)
     return result
@@ -157,13 +155,25 @@ def semantic_property(fn):
     return patch_on(ChatMessage, name)(decorated)
 
 
+def cache_getter(name):
+    def decorator(fn):
+        def decorated(self, *args, **kwargs):
+            if hasattr(self, name): return getattr(self, name)
+            result = fn(self, *args, **kwargs)
+            setattr(self, name, result)
+            return result
+        if hasattr(fn, "__name__"):
+            decorated.__name__ = fn.__name__
+        return decorated
+    return decorator
+
+
 class EnhancedMessage(ChatMessage):
 
     @patch_on(ChatMessage)
+    @cache_getter("_cache")
     def get_cache(self):
-        if not hasattr(self, "_cache"):
-            self._cache = {}
-        return self._cache
+        return {}
 
     @patch_on(ChatMessage)
     def semantic_cache(self, lookup, semantic=None):
@@ -186,3 +196,24 @@ class EnhancedMessage(ChatMessage):
     @semantic_property
     def parent():
         return "reply"
+
+    @patch_on(ChatMessage, "tag")
+    @property
+    @FailSilently
+    def tag(self):
+        result = self.semantic_cache("tag")
+        if result is None: return result
+        parent = self.parent
+        if parent is None: return result
+        if result == FailSilently(Triple.edges.lookup_semantic("reply_tag")):
+            result.get_body_preview = lambda *args, **kwargs: "a reply"
+        return result
+
+    @patch_on(ChatMessage)
+    def get_ancestors(self):
+        current = self
+        result = []
+        while current is not None and current not in result:
+            result.append(current)
+            current = current.parent
+        return reversed(result)

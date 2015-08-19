@@ -38,9 +38,10 @@ from ..models import (
     Listify,
     patch_on,
     semantic_property,
+    cache_getter,
 )
 
-# this modules imports
+# this module's imports
 from .base import (
     PageTitleMixin,
     NextOnSuccessMixin,
@@ -49,54 +50,14 @@ from .base import (
     EnhancedMessageMixin,
 )
 
-from triple import CreateFromThreeMessagesView
-
-
-def cache_getter(name):
-    def decorator(fn):
-        def decorated(self, *args, **kwargs):
-            if hasattr(self, name): return getattr(self, name)
-            result = fn(self, *args, **kwargs)
-            setattr(self, name, result)
-            return result
-        return decorated
-    return decorator
+# importing views
+from .triple import CreateFromThreeMessagesView
 
 
 def fail_with(fallback):
     class result(FailSilently):
         default_value = fallback
     return result
-
-
-class EnhancedMessage(ChatMessage):
-
-    @patch_on(ChatMessage, "tag")
-    @property
-    @FailSilently
-    def tag(self):
-        result = self.semantic_cache("tag")
-        if result is None: return result
-        parent = self.parent
-        if parent is None: return result
-        if result == FailSilently(Triple.edges.lookup_semantic("reply_tag")):
-            result.get_body_preview = lambda *args, **kwargs: "a reply"
-        return result
-
-    @patch_on(ChatMessage)
-    def enhance(self):
-        if hasattr(self, "enhanced"): return self
-        self.enhanced = True
-        return self
-
-    @patch_on(ChatMessage)
-    def get_ancestors(self):
-        current = self
-        result = []
-        while current is not None and current not in result:
-            result.append(current)
-            current = current.parent
-        return reversed(result)
 
 
 class UnmetSemanticsView(EnhancedViewMixin, MessageListView):
