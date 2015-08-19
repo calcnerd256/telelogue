@@ -52,44 +52,13 @@ from .base import (
 
 # importing views
 from .triple import CreateFromThreeMessagesView
+from .semantics import UnmetSemanticsView
 
 
 def fail_with(fallback):
     class result(FailSilently):
         default_value = fallback
     return result
-
-
-class UnmetSemanticsView(EnhancedViewMixin, MessageListView):
-    template_name = "transit/unmet_semantics.html"
-    page_title = "Semantic Frontier"
-
-    @FailSilently
-    def get_candidate(self, name):
-        try:
-            Triple.edges.lookup_semantic(name)
-            return
-        except SilentLookupFailure:
-            pass
-        result = {"name": name}
-        row = Triple.semantics[name]
-        for k, name in zip("source path".split(" "), row):
-            result[k] = {
-                "name": name,
-                "value": Triple.edges.lookup_semantic(name)
-            }
-        return result
-
-    @Listify
-    def get_candidates(self):
-        for name in Triple.semantics.keys():
-            candidate = self.get_candidate(name)
-            if candidate is not None:
-                yield candidate
-
-    @super_then(lambda: UnmetSemanticsView)
-    def get_context_data(self, context):
-        context["semantic_fringe"] = self.get_candidates()
 
 
 class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
