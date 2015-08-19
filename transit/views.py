@@ -63,7 +63,19 @@ def super_then(clsfn, name=None):
     return decoration
 
 
-class CreateFromThreeMessagesView(PageTitleMixin, NextOnSuccessMixin, CreateView):
+class EnhancedViewMixin(PageTitleMixin, NextOnSuccessMixin):
+    @super_then(lambda: EnhancedViewMixin)
+    def get_context_data(self, context):
+        context["this_page"] = self.request.path
+        for k in "hide sticky".split(" "):
+            context["%s_pk" % k] = getattr(Triple.lookup_semantic(k), "pk", None)
+
+
+class EnhancedMessageMixin(EnhancedViewMixin):
+    model = ChatMessage
+
+
+class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
     model = Triple
     page_title = 'Create triple'
     template_name = "transit/triple/create/from_messages.html"
@@ -97,8 +109,9 @@ class CreateFromThreeMessagesView(PageTitleMixin, NextOnSuccessMixin, CreateView
         result.update(self.get_messages())
 
 
-class UnmetSemanticsView(MessageListView):
+class UnmetSemanticsView(EnhancedViewMixin, MessageListView):
     template_name = "transit/unmet_semantics.html"
+    page_title = "Semantic Frontier"
 
     @FailSilently
     def get_candidate(self, name):
@@ -107,19 +120,14 @@ class UnmetSemanticsView(MessageListView):
             return
         except SilentLookupFailure:
             pass
-        source, path = [
-            {
-                "name": _name,
-                "value": Triple.edges.lookup_semantic(_name)
+        result = {"name": name}
+        row = Triple.semantics[name]
+        for k, name in zip("source path".split(" "), row):
+            result[k] = {
+                "name": name,
+                "value": Triple.edges.lookup_semantic(name)
             }
-            for _name
-            in Triple.semantics[name][0:2]
-        ]
-        return {
-            "name": name,
-            "source": source,
-            "path": path,
-        }
+        return result
 
     @Listify
     def get_candidates(self):
@@ -133,45 +141,49 @@ class UnmetSemanticsView(MessageListView):
         context["semantic_fringe"] = self.get_candidates()
 
 
-class UntaggedMessagesView(MessageListView):
+class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
     template_name="transit/untagged_messages.html"
-    def get_queryset(self):
-        qs = super(UntaggedMessagesView, self).get_queryset()
-        tag = Triple.lookup_semantic("tag")
-        if tag is None: return qs
-        tags = Triple.get_tags()
+    page_title = "Untagged Messages"
+
+    @super_then(lambda: UntaggedMessagesView)
+    @FailSilently
+    def get_queryset(self, qs):
+        tag = Triple.edges.lookup_semantic("tag")
+        if tag is None:
+            raise SilentLookupFailure()
         taggings = Triple.objects.filter(source=tag)
         tagged = taggings.values("path")
-        tag_removed = taggings.filter(destination=None).values("path")
+        tag_removed = taggings.filter(destination__isnull=True).values("path")
         query = Q(pk__in=tag_removed)|~Q(pk__in=tagged)
         candidates = qs.filter(query)
         return candidates.order_by("timestamp")
 
-    @classmethod
-    def annotate_objects(cls, object_list):
-        tag = Triple.lookup_semantic("tag")
-        if tag is None: return
-        for message in object_list:
-            message.tag = Triple.lookup(tag, message)
+    @FailSilently
+    def get_tags(self):
+        return list(Triple.util.get_tags())
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(UntaggedMessagesView, self).get_context_data(*args, **kwargs)
-        context["tags"] = Triple.get_tags()
-        context["tag_tag"] = Triple.lookup_semantic("tag")
-        self.annotate_objects(context["object_list"])
-        return context
+    @super_then(lambda: UntaggedMessagesView)
+    def get_context_data(self, context):
+        context.update(
+            {
+                "tags": self.get_tags(),
+                "tag_tag": FailSilently(Triple.edges.lookup_semantic)("tag"),
+            }
+        )
 
 
-class TaggedMessagesView(DetailView):
-    model = ChatMessage
+class TaggedMessagesView(EnhancedMessageMixin, DetailView):
     template_name = "transit/tag/tagged_messages.html"
+    page_title = "Tagged Messages"  # TODO: make this that helper method
+
     def get_tagged_messages(self):
         tag = self.get_object()
         tag_tag = Triple.lookup_semantic("tag")
         potential_edges = tag.destination_set
         if not tag_tag: return [e.path for e in potential_edges]
         edges = potential_edges.filter(source=tag_tag)
-        return self.model.objects.filter(pk__in=edges.values_list("path", flat=True))
+        pks = edges.values_list("path", flat=True)
+        return self.model.objects.filter(pk__in=pks)
 
     def get_context_data(self, *args, **kwargs):
         context = super(TaggedMessagesView, self).get_context_data(*args, **kwargs)
@@ -262,16 +274,6 @@ class EnhancedMessage(ChatMessage):
         return reversed(result)
 
 
-class EnhancedMessageMixin(PageTitleMixin):
-    model = ChatMessage
-    def get_context_data(self, *args, **kwargs):
-        context = super(EnhancedMessageMixin, self).get_context_data(*args, **kwargs)
-        context["this_page"] = self.request.path
-        for k in "hide sticky".split(" "):
-            context["%s_pk" % k] = getattr(Triple.lookup_semantic(k), "pk", None)
-        return context
-
-
 class TodayView(EnhancedMessageMixin, ListView):
     page_title = "Today's messages"
     template_name = "transit/today.html"
@@ -352,7 +354,7 @@ class ChatMessageDetailView(EnhancedMessageMixin, DetailView):
         return context
 
 
-class ReplyView(EnhancedMessageMixin, NextOnSuccessMixin, CreateView):
+class ReplyView(EnhancedMessageMixin, CreateView):
     template_name = "transit/reply.html"
 
     def get_page_title(self):
