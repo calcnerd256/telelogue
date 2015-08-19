@@ -1,9 +1,9 @@
 {% extends "chat/base.html" %}
 {% block content %}
     <ol>
-        {% include "chat/_message_preview.html" with object=source %}
-        {% include "chat/_message_preview.html" with object=path %}
-        {% include "chat/_message_preview.html" with object=destination %}
+        {% include "transit/_message_preview.html" with object=source %}
+        {% include "transit/_message_preview.html" with object=path %}
+        {% include "transit/_message_preview.html" with object=destination %}
     </ol>
     <form method="POST">
       {% csrf_token %}

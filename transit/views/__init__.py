@@ -3,9 +3,7 @@ import datetime
 
 # django imports
 from django.db.models import Q
-from django.views.generic import (
-    CreateView,
-)
+from django.views.generic import CreateView
 from django.views.generic.detail import (
     DetailView,
     _,
@@ -45,7 +43,12 @@ from .base import (
     PageTitleMixin,
     NextOnSuccessMixin,
     super_then,
+    EnhancedViewMixin,
+    EnhancedMessageMixin,
 )
+
+from triple import CreateFromThreeMessagesView
+
 
 def cache_getter(name):
     def decorator(fn):
@@ -56,24 +59,6 @@ def cache_getter(name):
             return result
         return decorated
     return decorator
-
-
-class EnhancedViewMixin(PageTitleMixin, NextOnSuccessMixin):
-    @super_then(lambda: EnhancedViewMixin)
-    def get_context_data(self, context):
-        context["this_page"] = self.request.path
-        for k in "hide sticky".split(" "):
-            context["%s_pk" % k] = getattr(
-                FailSilently(
-                    Triple.edges.lookup_semantic
-                )(k),
-                "pk",
-                None
-            )
-
-
-class EnhancedMessageMixin(EnhancedViewMixin):
-    model = ChatMessage
 
 
 def fail_with(fallback):
@@ -157,40 +142,6 @@ class EnhancedMessage(ChatMessage):
             result.append(current)
             current = current.parent
         return reversed(result)
-
-
-class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
-    model = Triple
-    page_title = 'Create triple'
-    template_name = "transit/triple/create/from_messages.html"
-    success_url = reverse_lazy("untagged_messages")
-    message_names = "source path destination".split(" ")
-
-    def get_message(self, name):
-        if hasattr(self, name): return getattr(self, name)
-        pk = int(self.kwargs[name])  # fail loudly
-        if 0 == pk: return None  # don't even cache it
-        result = get_object_or_404(ChatMessage, pk=pk)
-        setattr(self, name, result)
-        return result
-
-    def get_messages(self):
-        names = self.message_names
-        return dict(zip(names, map(self.get_message, names)))
-
-    @super_then(lambda: CreateFromThreeMessagesView)
-    def get_initial(self, result):
-        result.update(self.get_messages())
-
-    @super_then(lambda: CreateFromThreeMessagesView)
-    def get_form_class(self, result):
-        # TODO: make a form that knows how to do this
-        for key in self.message_names:
-            result.base_fields[key].widget = HiddenInput()
-
-    @super_then(lambda: CreateFromThreeMessagesView)
-    def get_context_data(self, result):
-        result.update(self.get_messages())
 
 
 class UnmetSemanticsView(EnhancedViewMixin, MessageListView):

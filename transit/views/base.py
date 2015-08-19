@@ -1,4 +1,5 @@
 from chat.views import PageTitleMixin
+from chat.models import ChatMessage
 
 from ..models import(
     Triple,
@@ -26,3 +27,20 @@ def super_then(clsfn, name=None):
         return decorated
     return decoration
 
+
+class EnhancedViewMixin(PageTitleMixin, NextOnSuccessMixin):
+    @super_then(lambda: EnhancedViewMixin)
+    def get_context_data(self, context):
+        context["this_page"] = self.request.path
+        for k in "hide sticky".split(" "):
+            context["%s_pk" % k] = getattr(
+                FailSilently(
+                    Triple.edges.lookup_semantic
+                )(k),
+                "pk",
+                None
+            )
+
+
+class EnhancedMessageMixin(EnhancedViewMixin):
+    model = ChatMessage
