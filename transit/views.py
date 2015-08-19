@@ -214,9 +214,7 @@ class UntaggedMessagesView(EnhancedViewMixin, MessageListView):
         )
 
 
-class TaggedMessagesView(EnhancedMessageMixin, ListView):
-    template_name = "transit/tag/tagged_messages.html"
-    page_title = "Tagged Messages"  # TODO: make this that helper method
+class ObjectAndListView(ListView):
     pk_url_kwarg = "pk"
 
     def get_object(self, queryset=None):
@@ -224,15 +222,6 @@ class TaggedMessagesView(EnhancedMessageMixin, ListView):
             self.model,
             pk=int(self.kwargs.get(self.pk_url_kwarg))
         )
-
-    def get_queryset(self):
-        tag = self.get_object()
-        tag_tag = Triple.lookup_semantic("tag")
-        potential_edges = tag.destination_set
-        if not tag_tag: return [e.path for e in potential_edges]
-        edges = potential_edges.filter(source=tag_tag)
-        pks = edges.values_list("path", flat=True)
-        return self.model.objects.filter(pk__in=pks)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -246,18 +235,31 @@ class TaggedMessagesView(EnhancedMessageMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = {}
-        if self.object:
-            context["object"] = self.object
-            obj = self.object
-            context_object_name = None
-            if isinstance(obj, models.Model):
-                if self.object._deferred:
-                    obj = obj._meta.proxy_for_model
-                    context_object_name = obj._meta.object_name.lower()
-            if context_object_name:
-                context[context_object_name] = self.object
+        obj = self.object
+        context_object_name = None
+        if isinstance(obj, models.Model):
+            if self.object._deferred:
+                obj = obj._meta.proxy_for_model
+            context_object_name = obj._meta.object_name.lower()
+        if context_object_name:
+            context[context_object_name] = self.object
         context.update(**kwargs)
-        return super(TaggedMessagesView, self).get_context_data(*args, **context)
+        return super(ObjectAndListView, self).get_context_data(*args, **context)
+
+
+class TaggedMessagesView(EnhancedMessageMixin, ObjectAndListView):
+    template_name = "transit/tag/tagged_messages.html"
+    page_title = "Tagged Messages"  # TODO: make this that helper method
+    pk_url_kwarg = "pk"
+
+    def get_queryset(self):
+        tag = self.get_object()
+        tag_tag = Triple.lookup_semantic("tag")
+        potential_edges = tag.destination_set
+        if not tag_tag: return [e.path for e in potential_edges]
+        edges = potential_edges.filter(source=tag_tag)
+        pks = edges.values_list("path", flat=True)
+        return self.model.objects.filter(pk__in=pks)
 
 
 def fail_with(fallback):
