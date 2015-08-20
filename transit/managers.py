@@ -142,3 +142,10 @@ class ViewManager(models.Manager):
         for m in result:
             if not getattr(m, "hide", False):
                 yield m
+
+    def get_sticky_posts(self):
+        sticky = self.model.edges.lookup_semantic("sticky")
+        glue = sticky.source_set.all()
+        pks = (tack.path_id for tack in glue if tack.current_value() is not None)
+        result = ChatMessage.objects.filter(id__in=pks)
+        return result.order_by("timestamp")
