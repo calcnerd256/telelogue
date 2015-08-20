@@ -1,4 +1,4 @@
-{% extends "chat/list.html" %}
+{% extends "transit/list.html" %}
 {% block before_list %}
     {{ block.super }}
     <a href="{% url "home" %}">
@@ -12,39 +12,12 @@
         <input type="text" name="body"{% if not object_list %} autofocus="html5"{% endif %}></input>
         <input type="submit" value="plain"></input>
     </form>
-    <ol>
-      {% if not object_list.0.hide %}
-        {% include "transit/_message_preview.html" with object=object_list|first top_post=True %}
-      {% endif %}
-      {% if not object_list.1.hide %}
-        {% include "transit/_message_preview.html" with object=object_list.1 %}
-      {% endif %}
-      {% if not object_list.2.hide %}
-        {% include "transit/_message_preview.html" with object=object_list.2 %}
-      {% endif %}
-      {% if not object_list.3.hide %}
-        {% include "transit/_message_preview.html" with object=object_list.3 %}
-      {% endif %}
-      {% if not object_list.4.hide %}
-        {% include "transit/_message_preview.html" with object=object_list.4 %}
-      {% endif %}
-    </ol>
-    <h3>sticky</h3>
-    <ul>
-        {% for object in sticky_posts %}
-            {% include "transit/_message_preview.html" %}
-        {% endfor %}
-    </ul>
+    <a href="{% url "pins" %}">Pinned Posts</a>
     <h3>today's messages</h3>
     <a href="{% url "message_create" %}">
         New message</a>
     (plain)
 {% endblock before_list %}
-{% block item %}
-  {% if not object.hide %}
-    {% include "transit/_message_preview.html" %}
-  {% endif %}
-{% endblock item %}
 {% block after_list %}
     {{ block.super }}
     <a href="{% url "message_list" %}">

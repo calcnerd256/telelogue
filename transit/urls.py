@@ -9,6 +9,7 @@ from .views import (
     TaggedMessagesView,
     ChatMessageDetailView,
     ReplyView,
+    CorkboardView,
 )
 
 admin.autodiscover()
@@ -21,6 +22,13 @@ urlpatterns = patterns(
             Today.as_view()
         ),
         name="today",
+    ),
+    url(
+        r'^chat/pin/$',
+        login_required(
+            CorkboardView.as_view()
+        ),
+        name="pins"
     ),
     url(
         r'^semantic/fringe/$',

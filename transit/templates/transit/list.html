@@ -1,0 +1,6 @@
+{% extends "chat/list.html" %}
+{% block item %}
+    {% if not object.hide %}
+        {% include "transit/_message_preview.html" with top_post=forloop.first %}
+    {% endif %}
+{% endblock item %}

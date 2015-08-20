@@ -7,3 +7,4 @@ from .tag import (
 from .today import TodayView
 from .message import ChatMessageDetailView
 from .reply import ReplyView
+from .sticky import Corkboard as CorkboardView
