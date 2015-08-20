@@ -129,6 +129,15 @@ class TransitManager(models.Manager):
 class ViewManager(models.Manager):
     def get_today(self):
         today = datetime.date.today()
-        yesterday = today - datetime.timedelta(1)
+        one_day = datetime.timedelta(1)
+        yesterday = today - one_day
         yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal())  # there must be a better way
-        return ChatMessage.objects.filter(timestamp__gte=yesterday_midnight)
+        tomorrow = today + one_day
+        tonight_midnight = datetime.datetime.fromordinal(tomorrow.toordinal())
+        result = ChatMessage.objects.filter(
+            timestamp__gte=yesterday_midnight,
+            timestamp__lte=tonight_midnight,
+        ).order_by("-timestamp")
+        for m in result:
+            if not getattr(m, "hide", False):
+                yield m
