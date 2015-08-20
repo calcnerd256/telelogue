@@ -6,12 +6,14 @@
     </a>
     <br />
     <h3>most recent</h3>
+  {% block quickthread_form %}
     <form method="POST" action="{% url "message_create" %}?next={% url "today" %}">
         {% csrf_token %}
         <label for="body">Quick (plain) message:</label>
         <input type="text" name="body"{% if not object_list %} autofocus="html5"{% endif %}></input>
         <input type="submit" value="plain"></input>
     </form>
+  {% endblock quickthread_form %}
     <a href="{% url "pins" %}">Pinned Posts</a>
     <h3>today's messages</h3>
     <a href="{% url "message_create" %}">

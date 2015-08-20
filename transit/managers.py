@@ -128,6 +128,7 @@ class TransitManager(models.Manager):
 
 class ViewManager(models.Manager):
     def get_today(self):
+        # TODO: move this to a manager on ChatMessage
         today = datetime.date.today()
         one_day = datetime.timedelta(1)
         yesterday = today - one_day
