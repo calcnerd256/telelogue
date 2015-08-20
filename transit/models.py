@@ -9,6 +9,7 @@ from .managers import (
     TransitManager,
     Decorum,
     FailSilently,
+    ViewManager,
 )
 
 
@@ -97,6 +98,7 @@ class Triple(models.Model):
     objects = models.Manager()
     edges = EdgeManager()
     util = TransitManager()
+    views = ViewManager()
 
     semantics = lookup_semantics
 

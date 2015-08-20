@@ -18,11 +18,11 @@ class TodayView(EnhancedMessageMixin, ListView):
 
     @Listify
     def get_queryset(self):
-        qs = super(TodayView, self).get_queryset()
+        result = Triple.views.get_today()
         today = datetime.date.today()
-        yesterday = today - datetime.timedelta(1)
-        yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal()) # there must be a better way
-        result = qs.filter(timestamp__gte=yesterday_midnight)
+        tomorrow = today + datetime.timedelta(1)
+        tonight_midnight = datetime.datetime.fromordinal(tomorrow.toordinal())
+        result = result.filter(timestamp__lte=tonight_midnight)
         for m in result.order_by("-timestamp"):
             if not m.hide:
                 yield m

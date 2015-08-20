@@ -1,5 +1,9 @@
+import datetime
 from types import MethodType
+
 from django.db import models
+
+from chat.models import ChatMessage
 
 
 class SilentLookupFailure(Exception):
@@ -121,3 +125,10 @@ class TransitManager(models.Manager):
         except SilentLookupFailure:
             pass
         return result
+
+class ViewManager(models.Manager):
+    def get_today(self):
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(1)
+        yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal())  # there must be a better way
+        return ChatMessage.objects.filter(timestamp__gte=yesterday_midnight)
