@@ -17,7 +17,7 @@ class ReplyView(EnhancedMessageMixin, CreateView):
         return self.model.objects.get(pk=pk)
 
     def get_siblings(self):
-        parent = self.get_parent
+        parent = self.get_parent()
         reply = Triple.lookup_semantic("reply")
         if reply is None: return []
         destinations = [(trip, trip.current_value()) for trip in parent.destination_set.all()]
@@ -39,3 +39,9 @@ class ReplyView(EnhancedMessageMixin, CreateView):
         umbilical.save()
         tag_edge.save()
         return response
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ReplyView, self).get_context_data(*args, **kwargs)
+        context["parent"] = self.get_parent()
+        context["object_list"] = self.get_siblings()
+        return context
