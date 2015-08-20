@@ -14,21 +14,27 @@ from .views import (
 
 admin.autodiscover()
 
-urlpatterns = patterns(
-    "",
+urlpatterns = [
     url(
-        r'^chat/today/$',
-        login_required(
-            Today.as_view()
-        ),
-        name="today",
-    ),
-    url(
-        r'^chat/pin/$',
-        login_required(
-            CorkboardView.as_view()
-        ),
-        name="pins"
+        r'^chat/',
+        include(
+            [
+                url(
+                    r'^today/$',
+                    login_required(
+                        Today.as_view()
+                    ),
+                    name="today",
+                ),
+                url(
+                    r'^pin/$',
+                    login_required(
+                        CorkboardView.as_view()
+                    ),
+                    name="pins"
+                ),
+            ]
+        )
     ),
     url(
         r'^semantic/fringe/$',
@@ -45,31 +51,38 @@ urlpatterns = patterns(
         name="create_from_three_messages",
     ),
     url(
-        r'^message/untagged/list/$',
-        login_required(
-            UntaggedMessagesView.as_view()
-        ),
-        name="untagged_messages",
+        r'^message/',
+        include(
+            [
+                url(
+                    r'^untagged/list/$',
+                    login_required(
+                        UntaggedMessagesView.as_view()
+                    ),
+                    name="untagged_messages",
+                ),
+                url(
+                    r'^tag/(?P<pk>\d+)/$',
+                    login_required(
+                        TaggedMessagesView.as_view()
+                    ),
+                    name="tagged_messages",
+                ),
+                url(
+                    r'^(?P<pk>\d+)/detail/$',
+                    login_required(
+                        ChatMessageDetailView.as_view()
+                    ),
+                    name="transit_message_detail",
+                ),
+                url(
+                    r'^(?P<parent>\d+)/reply/$',
+                    login_required(
+                        ReplyView.as_view()
+                    ),
+                    name="reply",
+                ),
+            ]
+        )
     ),
-    url(
-        r'^message/tag/(?P<pk>\d+)/$',
-        login_required(
-            TaggedMessagesView.as_view()
-        ),
-        name="tagged_messages",
-    ),
-    url(
-        r'^message/(?P<pk>\d+)/detail/$',
-        login_required(
-            ChatMessageDetailView.as_view()
-        ),
-        name="transit_message_detail",
-    ),
-    url(
-        r'^message/(?P<parent>\d+)/reply/$',
-        login_required(
-            ReplyView.as_view()
-        ),
-        name="reply",
-    ),
-)
+]
