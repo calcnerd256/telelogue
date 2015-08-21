@@ -53,6 +53,8 @@ lookup_semantics = {
     "sticky": ("featurebag", "four"),
     "five": ("successor", "four"),
     "reply tag": ("featurebag", "five"),
+    "six": ("successor", "five"),
+    "MIMEtype": ("featurebag", "six"),
 }
 
 
@@ -234,7 +236,10 @@ class EnhancedMessage(ChatMessage):
         return reverse("transit_message_detail", kwargs={"pk": self.pk})
 
     @patch_on(ChatMessage)
+    @FailSilently
     def get_mimetype(self):
-        # TODO: lookup the semantic object for self's MIMEtype
-        #return "text/plain"
-        pass
+        mimetype = Triple.edges.lookup_semantic("MIMEtype")
+        result = Triple.edges.lookup(self, mimetype)
+        if result is None:
+            raise SilentLookupFailure()
+        return result.body

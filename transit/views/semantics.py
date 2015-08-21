@@ -4,6 +4,7 @@ from ..models import (
     FailSilently,
     Triple,
     Listify,
+    SilentLookupFailure,
 )
 
 from .base import (

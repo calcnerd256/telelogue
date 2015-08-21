@@ -42,7 +42,7 @@ class ChatMessageNeighborhoodView(ChatMessageDetailView):
 
 class RawMessageView(EnhancedMessageMixin, BaseDetailView):
     response_class = HttpResponse
-    content_type = None
+    content_type = "text/plain"
 
     def render_to_response(self, *args, **response_kwargs):
         response_kwargs.setdefault("content_type", self.content_type)
