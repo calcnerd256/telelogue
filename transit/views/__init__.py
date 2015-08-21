@@ -8,6 +8,7 @@ from .today import TodayView
 from .message import (
     ChatMessageDetailView,
     ChatMessageNeighborhoodView,
+    RawMessageView,
 )
 from .reply import ReplyView
 from .sticky import Corkboard as CorkboardView

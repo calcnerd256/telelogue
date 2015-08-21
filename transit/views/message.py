@@ -1,4 +1,8 @@
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import (
+    DetailView,
+    BaseDetailView,
+)
+from django.http import HttpResponse
 
 from ..models import (
     Listify,
@@ -34,3 +38,27 @@ class ChatMessageNeighborhoodView(ChatMessageDetailView):
         )
         context["destinations"] = list(self.get_destinations())
         return context
+
+
+class RawMessageView(EnhancedMessageMixin, BaseDetailView):
+    response_class = HttpResponse
+    content_type = None
+
+    def render_to_response(self, *args, **response_kwargs):
+        response_kwargs.setdefault("content_type", self.content_type)
+        result = self.response_class(
+            content=self.body,
+            **response_kwargs
+        )
+        return result
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.body = self.object.body
+        content_type = self.get_mimetype()
+        if content_type is not None:
+            self.content_type = content_type
+        return self.render_to_response()
+
+    def get_mimetype(self):
+        return self.object.get_mimetype()

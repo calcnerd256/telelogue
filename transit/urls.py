@@ -9,6 +9,7 @@ from .views import (
     TaggedMessagesView,
     ChatMessageDetailView,
     ChatMessageNeighborhoodView,
+    RawMessageView,
     ReplyView,
     CorkboardView,
 )
@@ -70,18 +71,32 @@ urlpatterns = [
                     name="tagged_messages",
                 ),
                 url(
-                    r'^(?P<pk>\d+)/detail/$',
-                    login_required(
-                        ChatMessageDetailView.as_view()
-                    ),
-                    name="transit_message_detail",
-                ),
-                url(
-                    r'^(?P<pk>\d+)/incident/$',
-                    login_required(
-                        ChatMessageNeighborhoodView.as_view()
-                    ),
-                    name="message_edges",
+                    r'^(?P<pk>\d+)/',
+                    include(
+                        [
+                            url(
+                                r'^detail/$',
+                                login_required(
+                                    ChatMessageDetailView.as_view()
+                                ),
+                                name="transit_message_detail",
+                            ),
+                            url(
+                                r'^incident/$',
+                                login_required(
+                                    ChatMessageNeighborhoodView.as_view()
+                                ),
+                                name="message_edges",
+                            ),
+                            url(
+                                r'^raw/$',
+                                login_required(
+                                    RawMessageView.as_view()
+                                ),
+                                name="raw_message",
+                            ),
+                        ]
+                    )
                 ),
                 url(
                     r'^(?P<parent>\d+)/reply/$',

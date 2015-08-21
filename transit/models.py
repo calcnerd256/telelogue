@@ -232,3 +232,9 @@ class EnhancedMessage(ChatMessage):
     @patch_on(ChatMessage)
     def get_absolute_url(self):
         return reverse("transit_message_detail", kwargs={"pk": self.pk})
+
+    @patch_on(ChatMessage)
+    def get_mimetype(self):
+        # TODO: lookup the semantic object for self's MIMEtype
+        #return "text/plain"
+        pass
