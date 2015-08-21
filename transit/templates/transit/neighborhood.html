@@ -1,0 +1,46 @@
+{% extends "chat/base.html" %}
+{% block content %}
+    {% include "transit/_message_preview.html" %}
+    <h2>
+        participates in edges
+    </h2>
+    <h3>as the source</h3>
+    <ul>
+        {% for edge in sources %}
+            <li>
+                TODO: link to history of triple
+                <ol>
+                    <li>(YOU ARE HERE)</li>
+                    {% include "transit/_message_preview.html" with object=edge.path %}
+                    {% include "transit/_message_preview.html" with object=edge.destination %}
+                </ol>
+            </li>
+        {% endfor %}
+    </ul>
+    <h3>as the path</h3>
+    <ul>
+        {% for edge in paths %}
+            <li>
+                TODO: link to history of triple
+                <ol>
+                    {% include "transit/_message_preview.html" with object=edge.source %}
+                    <li>(YOU ARE HERE)</li>
+                    {% include "transit/_message_preview.html" with object=edge.destination %}
+                </ol>
+            </li>
+        {% endfor %}
+    </ul>
+    <h3>as the destination</h3>
+    <ul>
+        {% for edge in destinations %}
+            <li>
+                TODO: link to history of triple
+                <ol>
+                    {% include "transit/_message_preview.html" with object=edge.source %}
+                    {% include "transit/_message_preview.html" with object=edge.path %}
+                    <li>(YOU ARE HERE)</li>
+                </ol>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

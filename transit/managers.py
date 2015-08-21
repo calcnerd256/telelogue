@@ -149,3 +149,18 @@ class ViewManager(models.Manager):
         pks = (tack.path_id for tack in glue if tack.current_value() is not None)
         result = ChatMessage.objects.filter(id__in=pks)
         return result.order_by("timestamp")
+
+    def get_edges_incident_on(self, message, rel="source", corel="path"):
+        candidates = getattr(message, "%s_set" % rel).all()
+        def to_pk(edge):
+            other = getattr(edge, corel)
+            if other is None: return 0
+            return other.pk
+
+        def from_pk(pk):
+            for edge in candidates:
+                if pk == to_pk(edge):
+                    return edge
+
+        for pk in set(map(to_pk, candidates)):
+            yield from_pk(pk).current_dict()

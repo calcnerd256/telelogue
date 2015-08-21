@@ -1,5 +1,6 @@
 import warnings
 from django.db import models
+from django.core.urlresolvers import reverse
 from cuser.fields import CurrentUserField
 from chat.models import ChatMessage
 
@@ -219,3 +220,15 @@ class EnhancedMessage(ChatMessage):
             result.append(current)
             current = current.parent
         return reversed(result)
+
+    @patch_on(ChatMessage)
+    def get_previous(self):
+        return ChatMessage.objects.get(pk=self.pk - 1)
+
+    @patch_on(ChatMessage)
+    def get_next(self):
+        return ChatMessage.objects.get(pk=self.pk + 1)
+
+    @patch_on(ChatMessage)
+    def get_absolute_url(self):
+        return reverse("transit_message_detail", kwargs={"pk": self.pk})

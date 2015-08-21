@@ -8,6 +8,7 @@ from .views import (
     UntaggedMessagesView,
     TaggedMessagesView,
     ChatMessageDetailView,
+    ChatMessageNeighborhoodView,
     ReplyView,
     CorkboardView,
 )
@@ -74,6 +75,13 @@ urlpatterns = [
                         ChatMessageDetailView.as_view()
                     ),
                     name="transit_message_detail",
+                ),
+                url(
+                    r'^(?P<pk>\d+)/incident/$',
+                    login_required(
+                        ChatMessageNeighborhoodView.as_view()
+                    ),
+                    name="message_edges",
                 ),
                 url(
                     r'^(?P<parent>\d+)/reply/$',
