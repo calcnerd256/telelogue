@@ -1,3 +1,4 @@
+import base64
 from django.views.generic.detail import (
     DetailView,
     BaseDetailView,
@@ -7,6 +8,7 @@ from django.http import HttpResponse
 from ..models import (
     Listify,
     Triple,
+    SilentLookupFailure,
 )
 
 from .base import EnhancedMessageMixin
@@ -54,11 +56,24 @@ class RawMessageView(EnhancedMessageMixin, BaseDetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.body = self.object.body
-        content_type = self.get_mimetype()
-        if content_type is not None:
-            self.content_type = content_type
+        self.get_body()
+        self.get_mimetype()
         return self.render_to_response()
 
     def get_mimetype(self):
-        return self.object.get_mimetype()
+        result = self.object.get_mimetype()
+        if result is None: return result
+        self.content_type = result
+        return result
+
+    def get_body(self):
+        if not getattr(self, "object", None):
+            self.object = self.get_object()
+        self.body = self.object.body
+        try:
+            encoding = Triple.edges.lookup_semantic("base64")
+            if Triple.edges.lookup(self.object, encoding):
+                self.body = base64.b64decode(self.body)
+        except SilentLookupFailure:
+            pass
+        return self.body

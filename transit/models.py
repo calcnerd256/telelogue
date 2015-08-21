@@ -55,6 +55,8 @@ lookup_semantics = {
     "reply tag": ("featurebag", "five"),
     "six": ("successor", "five"),
     "MIMEtype": ("featurebag", "six"),
+    "seven": ("successor", "six"),
+    "base64": ("featurebag", "seven"),
 }
 
 
