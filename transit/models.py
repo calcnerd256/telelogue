@@ -45,19 +45,18 @@ lookup_semantics = {
     "transit": ("process", "zero"),
     "telelogue": ("process", "one"),
     "featurebag": ("telelogue", "one"),
-    "tag": ("featurebag", "one"),
-    "hide": ("featurebag", "two"),
-    "three": ("successor", "two"),
-    "reply": ("featurebag", "three"),
-    "four": ("successor", "three"),
-    "sticky": ("featurebag", "four"),
-    "five": ("successor", "four"),
-    "reply tag": ("featurebag", "five"),
-    "six": ("successor", "five"),
-    "MIMEtype": ("featurebag", "six"),
-    "seven": ("successor", "six"),
-    "base64": ("featurebag", "seven"),
 }
+featurebag_names = [
+    None,
+    "tag",
+    "hide",
+    "reply",
+    "sticky",
+    "reply tag",
+    "MIMEtype",
+    "base64",
+]
+semantic_cache = {}
 
 
 class Listify(Decorum):
@@ -106,6 +105,8 @@ class Triple(models.Model):
     views = ViewManager()
 
     semantics = lookup_semantics
+    featurebag = featurebag_names
+    semcache = semantic_cache
 
     @Managed
     def lookup(cls, source, path, author=NotImplemented):

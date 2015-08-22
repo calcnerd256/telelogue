@@ -64,14 +64,30 @@ class EdgeManager(models.Manager):
 
     def lookup_semantic(self, name):
         if name is None: return None
+        if name in self.model.semcache:
+            return self.model.semcache[name]
+        if name in self.model.featurebag:
+            if "featurebag" == name:
+                # this should not be
+                raise SilentLookupFailure()
+            featurebag = self.lookup_semantic("featurebag")
+            n = [
+                i
+                for i, feat
+                in enumerate(self.model.featurebag)
+                if feat == name
+            ][0]
+            num = self.model.util.lookup_natural(n)
+            destination = self.lookup(featurebag, num)
+            if destination is None: return destination
+            self.model.semcache[name] = destination
+            return destination
         if name not in self.model.semantics:
             raise SilentLookupFailure()
         semantics = self.model.semantics[name]
-        if 3 == len(semantics): return semantics[2]
         destination = self.lookup(*map(self.lookup_semantic, semantics))
         if destination is None: return destination  # don't cache deletion
-        with_cache = tuple(list(semantics) + [destination])
-        self.model.semantics[name] = with_cache
+        self.model.semcache[name] = destination
         return destination
 
     def set_semantic(self, name, destination, commit=True):
