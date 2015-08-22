@@ -1,4 +1,4 @@
-{% extends "chat/chatmessage_list.html" %}
+{% extends "chat/list.html" %}
 {% block before_list %}
     <dl>
         {% for object in semantic_fringe %}
@@ -15,10 +15,10 @@
 {% endblock before_list %}
 
 {% block item %}
-    {{ block.super }}
+    {% include "transit/_message_preview.html" with wrapper_element="li" %}
     Is it any of these?
     {% for candidate in semantic_fringe %}
-        <a href="{% url "create_from_three_messages" candidate.source.value.pk candidate.path.value.pk object.pk %}">
+        <a href="{% url "create_from_three_messages" candidate.source.value.pk candidate.path.value.pk object.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
             {{ candidate.name }}</a>
     {% endfor %}
 {% endblock item %}

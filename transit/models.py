@@ -45,6 +45,8 @@ lookup_semantics = {
     "transit": ("process", "zero"),
     "telelogue": ("process", "one"),
     "featurebag": ("telelogue", "one"),
+    "this telelogue": ("local", "telelogue"),
+    "user here": ("this telelogue", "user"),
 }
 featurebag_names = [
     None,
@@ -176,6 +178,12 @@ def cache_getter(name):
     return decorator
 
 
+def not_null(x):
+    if x is None:
+        raise SilentLookupFailure()
+    return x
+
+
 class EnhancedMessage(ChatMessage):
 
     @patch_on(ChatMessage)
@@ -187,11 +195,9 @@ class EnhancedMessage(ChatMessage):
     def semantic_cache(self, lookup, semantic=None):
         if semantic is None: semantic = lookup
         cache = self.get_cache()
-        if lookup in cache: return cache[lookup]
-        edges = Triple.edges
-        result = edges.lookup(edges.lookup_semantic(semantic), self)
-        cache[lookup] = result
-        return result
+        if lookup not in cache:
+            cache[lookup] = self.lookup_semantic(semantic, as_path=True)
+        return cache[lookup]
 
     @semantic_property
     def hide():
@@ -241,8 +247,17 @@ class EnhancedMessage(ChatMessage):
     @patch_on(ChatMessage)
     @FailSilently
     def get_mimetype(self):
-        mimetype = Triple.edges.lookup_semantic("MIMEtype")
-        result = Triple.edges.lookup(self, mimetype)
-        if result is None:
-            raise SilentLookupFailure()
-        return result.body
+        return not_null(self.lookup_semantic("MIMEtype")).body
+
+    @patch_on(ChatMessage)
+    def lookup_semantic(self, name, as_path=False):
+        other = Triple.edges.lookup_semantic(name)
+        if as_path:
+            return not_null(other).lookup(self)
+        return self.lookup(other)
+
+    @patch_on(ChatMessage)
+    def lookup(self, other, reverse=False):
+        if reverse:
+            return not_null(other).lookup(self)
+        return Triple.edges.lookup(self, other)
