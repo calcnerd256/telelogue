@@ -142,6 +142,11 @@ class TransitManager(models.Manager):
             pass
         return result
 
+    def coerce_luser(self, user):
+        n = self.lookup_natural(user.pk)
+        local_users = self.model.edges.lookup_semantic("user here")
+        return self.model.edges.lookup(local_users, n)
+
 class ViewManager(models.Manager):
     def get_today(self):
         # TODO: move this to a manager on ChatMessage
