@@ -1,7 +1,11 @@
 import warnings
+
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+
 from cuser.fields import CurrentUserField
+
 from chat.models import ChatMessage
 
 from .managers import (
@@ -261,3 +265,22 @@ class EnhancedMessage(ChatMessage):
         if reverse:
             return not_null(other).lookup(self)
         return Triple.edges.lookup(self, other)
+
+    @patch_on(ChatMessage)
+    @FailSilently
+    def as_natural(self):
+        natural = Triple.edges.lookup_semantic("natural")
+        if not_null(self.lookup_semantic("type")).pk != not_null(natural).pk:
+            raise SilentLookupFailure()
+        if hasattr(self, "numeric"): return self.numeric
+        n = 0
+        while True:
+            if not_null(Triple.util.lookup_natural(n)).id == self.id:
+                return n
+            n += 1
+
+    @patch_on(ChatMessage)
+    @FailSilently
+    def get_local_user(self):
+        pk = not_null(self.lookup_semantic("user here")).as_natural()
+        return User.objects.get(pk=pk)

@@ -8,4 +8,15 @@
     {% include "transit/_message_preview.html" with object=object.get_next %}
     <h2>Relationships</h2>
     <a href="{% url "message_edges" object.pk %}">Adjacency</a>
+    <h2>Special Identity</h2>
+    {% if object.as_natural %}
+        This is the natural number
+        {{ object.as_natural }}
+    {% endif %}
+    {% if object.get_local_user %}
+        This is the local user
+        <a href="{% url "user_detail" object.get_local_user.pk %}">
+            {{ object.get_local_user }}
+        </a>
+    {% endif %}
 {% endblock content %}
