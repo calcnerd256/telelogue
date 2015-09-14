@@ -61,6 +61,7 @@ featurebag_names = [
     "reply tag",
     "MIMEtype",
     "base64",
+    "bag",
 ]
 semantic_cache = {}
 
