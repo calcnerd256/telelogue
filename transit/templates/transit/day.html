@@ -1,0 +1,10 @@
+{% extends "transit/today.html" %}
+{% block day_nav %}
+    <h3>{{ today }}</h3>
+    <a href="{% url "day" year=yesterday.year month=yesterday.month day=yesterday.day %}">
+        previous day</a>
+    |
+    <a href="{% url "day" year=tomorrow.year month=tomorrow.month day=tomorrow.day %}">
+        next day
+    </a>
+{% endblock day_nav %}

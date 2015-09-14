@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from .views import (
     TodayView as Today,
+    DayView,
     UnmetSemanticsView,
     CreateFromThreeMessagesView,
     UntaggedMessagesView,
@@ -27,6 +28,13 @@ urlpatterns = [
                         Today.as_view()
                     ),
                     name="today",
+                ),
+                url(
+                    r'^date/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$',
+                    login_required(
+                        DayView.as_view()
+                    ),
+                    name="day",
                 ),
                 url(
                     r'^pin/$',

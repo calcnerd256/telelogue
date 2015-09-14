@@ -15,7 +15,12 @@
     </form>
   {% endblock quickthread_form %}
     <a href="{% url "pins" %}">Pinned Posts</a>
+    <br />
+  {% block day_nav %}
     <h3>today's messages</h3>
+    (<a href="{% url "day" year=yesterday.year month=yesterday.month day=yesterday.day %}">yesterday</a>)
+  {% endblock day_nav %}
+    <br />
     <a href="{% url "message_create" %}">
         New message</a>
     (plain)

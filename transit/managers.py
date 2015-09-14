@@ -148,6 +148,21 @@ class TransitManager(models.Manager):
         return self.model.edges.lookup(local_users, n)
 
 class ViewManager(models.Manager):
+    def get_between_times(self, begin_time, end_time):
+        result = ChatMessage.objects.filter(
+            timestamp__gte=begin_time,
+            timestamp__lte=end_time,
+        ).order_by("-timestamp")
+        for m in result:
+            if not getattr(m, "hide", False):
+                yield m
+
+    def get_day(self, day):
+        day_ordinal = day.toordinal()
+        beginning = datetime.datetime.fromordinal(day_ordinal)
+        end = datetime.datetime.fromordinal(day_ordinal + 1)
+        return self.get_between_times(beginning, end)
+
     def get_today(self):
         # TODO: move this to a manager on ChatMessage
         today = datetime.date.today()
@@ -156,13 +171,7 @@ class ViewManager(models.Manager):
         yesterday_midnight = datetime.datetime.fromordinal(yesterday.toordinal())  # there must be a better way
         tomorrow = today + one_day
         tonight_midnight = datetime.datetime.fromordinal(tomorrow.toordinal())
-        result = ChatMessage.objects.filter(
-            timestamp__gte=yesterday_midnight,
-            timestamp__lte=tonight_midnight,
-        ).order_by("-timestamp")
-        for m in result:
-            if not getattr(m, "hide", False):
-                yield m
+        return self.get_between_times(yesterday_midnight, tonight_midnight)
 
     def get_sticky_posts(self):
         sticky = self.model.edges.lookup_semantic("sticky")

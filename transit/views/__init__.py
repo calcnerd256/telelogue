@@ -4,7 +4,10 @@ from .tag import (
     UntaggedMessagesView,
     TaggedMessagesView,
 )
-from .today import TodayView
+from .today import (
+    TodayView,
+    DayView,
+)
 from .message import (
     ChatMessageDetailView,
     ChatMessageNeighborhoodView,
