@@ -34,6 +34,15 @@
         <a href="{% url "reply" object.parent.pk %}">
             {{ object.parent.get_body_preview }}</a>
     {% endif %}
+    {% if your_bag %}
+        {% if object.in_bag %}
+            in bag (<a href="{% url "create_from_three_messages" your_bag.bag.id object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">remove</a>)
+        {% else %}
+            {% if object.pk %}
+                (<a href="{% url "create_from_three_messages" your_bag.bag.id object.pk your_bag.bag.id %}{% if this_page %}?next={{ this_page }}{% endif %}">add to bag</a>)
+            {% endif %}
+        {% endif %}
+    {% endif %}
 {% endblock metadata %}
 {% block message_body %}
     {% block before_message %}

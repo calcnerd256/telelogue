@@ -18,6 +18,7 @@ class TodayView(EnhancedMessageMixin, ListView):
     def get_queryset(self):
         return list(Triple.views.get_today())
 
+
 class DayView(TodayView):
     template_name = "transit/day.html"
 

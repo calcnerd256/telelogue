@@ -4,3 +4,14 @@
         {% include "transit/_message_preview.html" with top_post=forloop.first %}
     {% endif %}
 {% endblock item %}
+{% block after_list %}
+    {{ block.super }}
+    {% if your_bag %}
+        <h3>your bag</h3>
+        <ul>
+            {% for object in your_bag.contents %}
+                {% include "transit/_message_preview.html" with small=True %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock after_list %}

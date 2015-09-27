@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from cuser.fields import CurrentUserField
+from cuser.middleware import CuserMiddleware
 
 from chat.models import ChatMessage
 
@@ -285,3 +286,12 @@ class EnhancedMessage(ChatMessage):
     def get_local_user(self):
         pk = not_null(self.lookup_semantic("user here")).as_natural()
         return User.objects.get(pk=pk)
+
+    @patch_on(ChatMessage)
+    @FailSilently
+    def in_bag(self):
+        cuser = CuserMiddleware.get_user()
+        user = not_null(Triple.util.coerce_luser(cuser))
+        bag = not_null(Triple.edges.lookup_semantic("bag"))
+        my_bag = not_null(user.lookup(bag))
+        return my_bag.lookup(self)
