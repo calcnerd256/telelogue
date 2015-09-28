@@ -15,26 +15,39 @@
               <ul class="siblings">
                   {% for object in left %}
                       {% include "transit/_message_preview.html" with small=True %}
-<span>{{ object.children|length }}</span>
+                      <span>{{ object.children|length }} child(ren)</span>
                   {% endfor %}
               </ul>
               <ul class="siblings">
                   {% include "transit/_message_preview.html" with object=ancestor %}
-<span>{{ ancestor.children|length }}</span>
+                      <span>{{ ancestor.children|length }} child(ren)</span>
               </ul>
               <ul class="siblings">
                   {% for object in right %}
                       {% include "transit/_message_preview.html" with small=True %}
-<span>{{ object.children|length }}</span>
+                      <span>{{ object.children|length }} child(ren)</span>
                   {% endfor %}
               </ul>
           </li>
       {% endfor %}
     </ol>
     {{ block.super }}
-    <ul>
-        {% for object in object_list %}
-            {% include "transit/_message_preview.html" %}
+    <ol>
+        {% for generation in descendants %}
+            <li>
+                <ul class="siblings">
+                    {% include "transit/_message_preview.html" with object=generation.0 %}
+                    <span>{{ generation.0.children|length }} child(ren)</span>
+                </ul>
+                <ul class="siblings">
+                    {% for object in generation %}
+                        {% if not forloop.first %}
+                            {% include "transit/_message_preview.html" with small=True %}
+                            <span>{{ object.children|length }} child(ren)</span>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
-    </ul>
+    </ol>
 {% endblock content %}

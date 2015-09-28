@@ -37,6 +37,20 @@ class ReplyView(EnhancedMessageMixin, CreateView):
         right = result[index+1:]
         return left, message, right
 
+    def get_deep_descendants(self):
+        generations = []
+        next_generation = list(self.get_siblings())
+        visited = []
+        while len(next_generation):
+            non_cycles = [m for m in next_generation if m not in visited]
+            for m in non_cycles:
+                m.children = list(self.get_siblings(m))
+                visited.append(m)
+            generations.append(non_cycles)
+            heir = non_cycles[0]
+            next_generation = heir.children
+        return generations
+
     def form_valid(self, form):
         reply = Triple.lookup_semantic("reply")
         reply_tag = Triple.lookup_semantic("reply tag")
@@ -58,4 +72,5 @@ class ReplyView(EnhancedMessageMixin, CreateView):
         context["parent"] = parent
         context["object_list"] = self.get_siblings()
         context["ancestors"] = map(self.trisect_siblings, parent.get_ancestors())
+        context["descendants"] = self.get_deep_descendants()
         return context
