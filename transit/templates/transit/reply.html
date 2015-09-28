@@ -1,9 +1,34 @@
 {% extends "chat/chatmessage_form.html" %}
+{% block style %}
+    {{ block.super }}
+
+    ul.siblings{
+        width: 25%;
+        display: inline-block;
+    }
+{% endblock style %}
 {% block content %}
     <h1>Reply to thread</h1>
     <ol>
-      {% for ancestor in parent.get_ancestors %}
-        {% include "transit/_message_preview.html" with object=ancestor %}
+      {% for left, ancestor, right in ancestors %}
+          <li>
+              <ul class="siblings">
+                  {% for object in left %}
+                      {% include "transit/_message_preview.html" with small=True %}
+<span>{{ object.children|length }}</span>
+                  {% endfor %}
+              </ul>
+              <ul class="siblings">
+                  {% include "transit/_message_preview.html" with object=ancestor %}
+<span>{{ ancestor.children|length }}</span>
+              </ul>
+              <ul class="siblings">
+                  {% for object in right %}
+                      {% include "transit/_message_preview.html" with small=True %}
+<span>{{ object.children|length }}</span>
+                  {% endfor %}
+              </ul>
+          </li>
       {% endfor %}
     </ol>
     {{ block.super }}
