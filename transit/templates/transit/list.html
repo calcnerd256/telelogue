@@ -15,6 +15,7 @@
     {{ block.super }}
     {% if your_bag %}
         <h3>your bag</h3>
+        (<a href="{% url "create_bag" %}">clone</a>)
         {% for object in your_bag.contents %}
             {% if forloop.first %}
                 {% include "transit/_message_row.html" with begin_table=True %}

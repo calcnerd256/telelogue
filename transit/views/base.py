@@ -41,7 +41,7 @@ class EnhancedViewMixin(PageTitleMixin, NextOnSuccessMixin):
             Triple.edges.lookup_semantic("bag"),
         )
         bag_contents = ChatMessage.objects.filter(
-            id__in=[t.path.id for t in my_bag.source_set.all() if t.path.in_bag()]
+            id__in=[t.path.id for t in my_bag.source_set.all() if t.path and t.path.in_bag()]
         ).order_by("-timestamp")
         return {"bag": my_bag, "contents": bag_contents}
 

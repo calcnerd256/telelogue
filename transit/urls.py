@@ -13,6 +13,7 @@ from .views import (
     RawMessageView,
     ReplyView,
     CorkboardView,
+    CreateBagView,
 )
 
 admin.autodiscover()
@@ -115,5 +116,10 @@ urlpatterns = [
                 ),
             ]
         )
+    ),
+    url(
+        r'^bag/create/$',
+        login_required(CreateBagView.as_view()),
+        name="create_bag"
     ),
 ]

@@ -15,3 +15,4 @@ from .message import (
 )
 from .reply import ReplyView
 from .sticky import Corkboard as CorkboardView
+from .bag import CreateBagView
