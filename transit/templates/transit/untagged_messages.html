@@ -1,4 +1,4 @@
-{% extends "transit/today.html" %}
+{% extends "transit/list.html" %}
 {% block before_list %}
     <h2>Tags:</h2>
     <ol>
@@ -11,14 +11,21 @@
         {% endfor %}
     </ol>
     <h2>Untagged messages:</h2>
+    {{ block.super }}
 {% endblock before_list %}
 {% block item %}
     {% if not object.tag %}
-        {{ block.super }}
+        <tr>
+            <td>
         tag as:
+            </td>
+            <td colspan="8">
         {% for tag in tags %}
             <a href="{% url "create_from_three_messages" tag_tag.pk object.pk tag.pk %}">
                 {{ tag.get_body_preview }}</a>{% if not forloop.last %},
         {% endif %}{% endfor %}
+            </td>
+        </tr>
+        {{ block.super }}
     {% endif %}
 {% endblock item %}
