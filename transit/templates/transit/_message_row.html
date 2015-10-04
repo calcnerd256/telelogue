@@ -44,7 +44,7 @@
                         </a>
                     {% endif %}
                 </td>
-                <td>
+                <td class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
                     <a href="{{ object.get_author_url }}">
                         {{ object.author }}</a>
                 </td>
