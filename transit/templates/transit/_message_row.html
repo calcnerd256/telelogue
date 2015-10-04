@@ -1,5 +1,5 @@
 {% if begin_table %}
-    <table border="2">
+    <table border="2" cellspacing="5" cellpadding="5">
         <thead>
             <tr>
                 <th>
@@ -37,7 +37,7 @@
     </table>
 {% else %}
             <tr>
-                <td rowspan="2">
+                <td rowspan="2" class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
                     {% if object.pk %}
                         <a href="{% url "transit_message_detail" object.pk %}">
                             {{ object.pk }}
@@ -114,11 +114,6 @@
             <tr class="ChatMessage bottom_row">
                 <td colspan="8" class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
                     {{ object.body|linebreaksbr }}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="9">
-                    <hr />
                 </td>
             </tr>
 {% endif %}
