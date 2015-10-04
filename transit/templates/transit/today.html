@@ -1,6 +1,5 @@
 {% extends "transit/list.html" %}
 {% block before_list %}
-    {{ block.super }}
     <a href="{% url "home" %}">
         Home
     </a>
@@ -24,6 +23,7 @@
     <a href="{% url "message_create" %}">
         New message</a>
     (plain)
+    {{ block.super }}
 {% endblock before_list %}
 {% block after_list %}
     {{ block.super }}

@@ -1,0 +1,124 @@
+{% if begin_table %}
+    <table border="2">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Author
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Reply
+                </th>
+                <th>
+                    Hide
+                </th>
+                <th>
+                    Sticky
+                </th>
+                <th>
+                    Tag
+                </th>
+                <th>
+                    Parent
+                </th>
+                <th>
+                    In Bag
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+{% elif end_table %}
+        </tbody>
+    </table>
+{% else %}
+            <tr>
+                <td rowspan="2">
+                    {% if object.pk %}
+                        <a href="{% url "transit_message_detail" object.pk %}">
+                            {{ object.pk }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ object.get_author_url }}">
+                        {{ object.author }}</a>
+                </td>
+                <td>
+                    {{ object.timestamp }}
+                </td>
+                <td>
+                    {% block reply_form %}
+                        {% if object.pk %}
+                            <form method="POST" action="{% url "reply" object.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                                {% csrf_token %}
+                                <label for="body">
+                                    <a href="{% url "reply" object.pk %}">Reply</a>:
+                                </label>
+                                <{% if big %}textarea{% else %}input{% endif%} name="body"{% if top_post %} autofocus="html5"{% endif %}></{% if big %}textarea{% else %}input{% endif%}>
+                                <input type="submit" value="Reply"></input>
+                            </form>
+                        {% endif %}
+                    {% endblock reply_form %}
+                </td>
+                <td>
+                    {% if hide_pk and object.pk %}
+                        <a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                            hide
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if sticky_pk and object.pk %}
+                        {% if object.sticky %}
+                            sticky
+                            (<a href="{% url "create_from_three_messages" sticky_pk object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">unstick</a>)
+                        {% else %}
+                            <a href="{% url "create_from_three_messages" sticky_pk object.pk object.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                                pin
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if object.tag.pk %}
+                        <a href="{% url "tagged_messages" object.tag.pk %}">
+                            {{ object.tag.get_body_preview }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td class="ChatMessage{% if object.parent %} {% if user.id == object.parent.author.id%}me {% endif %}user_{{ object.parent.author.id }}{% endif %}">
+                    {% if object.parent.pk %}
+                        <a href="{% url "reply" object.parent.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                            {{ object.parent.get_body_preview }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if your_bag %}
+                        {% if object.in_bag %}
+                            in bag
+                            (<a href="{% url "create_from_three_messages" your_bag.bag.id object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">remove</a>)
+                        {% else %}
+                            <a href="{% url "create_from_three_messages" your_bag.bag.id object.pk your_bag.bag.id %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                                add to bag
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr class="ChatMessage bottom_row">
+                <td colspan="8" class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
+                    {{ object.body|linebreaksbr }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="9">
+                    <hr />
+                </td>
+            </tr>
+{% endif %}

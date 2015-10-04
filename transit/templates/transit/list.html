@@ -1,17 +1,29 @@
 {% extends "chat/list.html" %}
 {% block item %}
     {% if not object.hide %}
-        {% include "transit/_message_preview.html" with top_post=forloop.first %}
+        {% include "transit/_message_row.html" with top_post=forloop.first %}
     {% endif %}
 {% endblock item %}
+{% block before_list %}
+    {{ block.super }}
+    {% block after_before_list %}
+    {% endblock after_before_list %}
+    {% include "transit/_message_row.html" with begin_table=True %}
+{% endblock before_list %}
 {% block after_list %}
+    {% include "transit/_message_row.html" with end_table=True %}
     {{ block.super }}
     {% if your_bag %}
         <h3>your bag</h3>
-        <ul>
-            {% for object in your_bag.contents %}
-                {% include "transit/_message_preview.html" with small=True %}
-            {% endfor %}
-        </ul>
+        {% for object in your_bag.contents %}
+            {% if forloop.first %}
+                {% include "transit/_message_row.html" with begin_table=True %}
+            {% endif %}
+            {% include "transit/_message_row.html" with top_post=forloop.first %}
+            {% if forloop.last %}
+                {% include "transit/_message_row.html" with end_table=True %}
+            {% endif %}
+
+        {% endfor %}
     {% endif %}
 {% endblock after_list %}
