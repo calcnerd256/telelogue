@@ -17,11 +17,12 @@ class ChatMessageExportMixin(object):
         #ASCII-safe
         points = self.get_body_codepoints()
         if not points: return points
+        points_no_linebreaks = [p if p != '\n' else ' ' for p in points]
         whitelist = [ord(c) for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
         safepoints = [
             p
             for p
-            in points
+            in points_no_linebreaks
             if p < 256 and p in whitelist
         ]
         return "".join([chr(c) for c in safepoints])[:64]
