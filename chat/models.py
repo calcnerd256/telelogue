@@ -17,15 +17,19 @@ class ChatMessageExportMixin(object):
         #ASCII-safe
         points = self.get_body_codepoints()
         if not points: return points
-        points_no_linebreaks = [p if p != 10 else 32 for p in points]
-        whitelist = [ord(c) for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
-        safepoints = [
-            p
+        whitelist = [c for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
+        code_map = {
+            ord("\n"): ord(" "),
+        }
+        asciipoints = [
+            code_map.get(p, p)
             for p
-            in points_no_linebreaks
-            if p < 256 and p in whitelist
+            in points
+            if p < 256
         ]
-        return "".join([chr(c) for c in safepoints])[:64]
+        preview_chars = map(chr, asciipoints)
+        safechars = [c for c in preview_chars if c in whitelist]
+        return "".join(safechars[:64])
 
 
 class ChatMessage(ChatMessageExportMixin, models.Model):
