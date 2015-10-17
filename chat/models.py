@@ -17,7 +17,7 @@ class ChatMessageExportMixin(object):
         #ASCII-safe
         points = self.get_body_codepoints()
         if not points: return points
-        points_no_linebreaks = [p if p != '\n' else ' ' for p in points]
+        points_no_linebreaks = [p if p != 10 else 32 for p in points]
         whitelist = [ord(c) for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
         safepoints = [
             p
