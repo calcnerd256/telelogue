@@ -13,23 +13,31 @@ class ChatMessageExportMixin(object):
         hexpoints = ["%X" % n for n in codepoints]
         return " ".join(hexpoints)
 
+    def preview_codepoint(self, point):
+        # monadic: return zero or more codepoints to flatten into the string
+        whitelist = [ord(c) for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
+        code_map = {
+            ord("\n"): [ord(" ")],
+        }
+        if point >= 256: return []
+        if point in code_map: return code_map[point];
+        if point not in whitelist: return []
+        return [point]
+
     def get_body_preview(self):
         #ASCII-safe
         points = self.get_body_codepoints()
         if not points: return points
-        whitelist = [c for c in " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789,-_:/"]
-        code_map = {
-            ord("\n"): ord(" "),
-        }
-        asciipoints = [
-            code_map.get(p, p)
-            for p
-            in points
-            if p < 256
-        ]
-        preview_chars = map(chr, asciipoints)
-        safechars = [c for c in preview_chars if c in whitelist]
-        return "".join(safechars[:64])
+        return "".join(
+            [
+                chr(p)
+                for point
+                in points
+                for p
+                in self.preview_codepoint(point)
+                if p < 256
+            ][:64]
+        )
 
 
 class ChatMessage(ChatMessageExportMixin, models.Model):
