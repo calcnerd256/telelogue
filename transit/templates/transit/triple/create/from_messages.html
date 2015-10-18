@@ -3,7 +3,7 @@
     <form method="POST">
       {% csrf_token %}
       {{ form.as_p }}
-      <input type="submit" value="create triple" />
+      <input type="submit" value="create edge" />
     </form>
     <ol>
         {% include "transit/_message_preview.html" with object=source %}
@@ -13,7 +13,7 @@
     <form method="POST">
       {% csrf_token %}
       {{ form.as_p }}
-      <input type="submit" value="create triple" />
+      <input type="submit" value="create edge" />
     </form>
 {% endblock content %}
 
