@@ -36,14 +36,13 @@ class EnhancedViewMixin(PageTitleMixin, NextOnSuccessMixin):
     @FailSilently
     def get_bag(self):
         cuser = self.request.user
-        my_bag = Triple.edges.lookup(
-            Triple.util.coerce_luser(cuser).id,
-            Triple.edges.lookup_semantic("bag"),
-        )
+        you = Triple.util.coerce_luser(cuser)
+        bag = Triple.edges.lookup_semantic("bag")
+        my_bag = Triple.edges.lookup(you.id, bag)
         bag_contents = ChatMessage.objects.filter(
             id__in=[t.path.id for t in my_bag.source_set.all() if t.path and t.path.in_bag()]
         ).order_by("-timestamp")
-        return {"bag": my_bag, "contents": bag_contents}
+        return {"bag": my_bag, "contents": bag_contents, "concept": bag, "you": you}
 
     @super_then(lambda: EnhancedViewMixin)
     def get_context_data(self, context):

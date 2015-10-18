@@ -26,9 +26,11 @@
                 <th>
                     Parent
                 </th>
+                {% block bag_header %}
                 <th>
                     In Bag
                 </th>
+                {% endblock bag_header %}
             </tr>
         </thead>
         <tbody>
@@ -36,6 +38,7 @@
         </tbody>
     </table>
 {% else %}
+    {% block columns_row %}
             <tr>
                 <td rowspan="2" class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
                     {% if object.pk %}
@@ -99,6 +102,7 @@
                     {% endif %}
                 </td>
                 <td>
+                  {% block bag_cell %}
                     {% if your_bag %}
                         {% if object.in_bag %}
                             in bag
@@ -109,8 +113,10 @@
                             </a>
                         {% endif %}
                     {% endif %}
+                  {% endblock bag_cell %}
                 </td>
             </tr>
+    {% endblock columns_row %}
             <tr class="ChatMessage bottom_row">
                 <td colspan="8" class="ChatMessage {% if user.id == object.author.id %}me {% endif %}user_{{ object.author.id }}">
                     {{ object.body|linebreaksbr }}

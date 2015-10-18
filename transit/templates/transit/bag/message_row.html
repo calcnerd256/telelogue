@@ -1,0 +1,17 @@
+{% extends "transit/_message_row.html" %}
+{% block bag_header %}
+    <th>
+        Bag
+    </th>
+{% endblock bag_header %}
+{% block bag_cell %}
+    {% if your_bag and your_bag.concept.id and your_bag.you.id %}
+        <a href="{% url "create_from_three_messages" your_bag.you.id your_bag.concept.id object.id %}{% if this_page %}?next={{ this_page }}{% endif %}">
+            make bag</a>
+        or
+        <a href="{% url "create_from_three_messages" your_bag.bag.id object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">remove from bag
+        </a>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock bag_cell %}

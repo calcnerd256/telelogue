@@ -18,11 +18,11 @@
         (<a href="{% url "create_bag" %}">clone</a>)
         {% for object in your_bag.contents %}
             {% if forloop.first %}
-                {% include "transit/_message_row.html" with begin_table=True %}
+                {% include "transit/bag/message_row.html" with begin_table=True %}
             {% endif %}
-            {% include "transit/_message_row.html" with top_post=forloop.first %}
+            {% include "transit/bag/message_row.html" with top_post=forloop.first %}
             {% if forloop.last %}
-                {% include "transit/_message_row.html" with end_table=True %}
+                {% include "transit/bag/message_row.html" with end_table=True %}
             {% endif %}
 
         {% endfor %}
