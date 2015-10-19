@@ -12,6 +12,9 @@
                     Date
                 </th>
                 <th>
+                    Parent
+                </th>
+                <th>
                     Reply
                 </th>
                 <th>
@@ -22,9 +25,6 @@
                 </th>
                 <th>
                     Tag
-                </th>
-                <th>
-                    Parent
                 </th>
                 {% block bag_header %}
                 <th>
@@ -53,6 +53,13 @@
                 </td>
                 <td>
                     {{ object.timestamp }}
+                </td>
+                <td class="ChatMessage{% if object.parent %} {% if user.id == object.parent.author.id%}me {% endif %}user_{{ object.parent.author.id }}{% endif %}">
+                    {% if object.parent.pk %}
+                        <a href="{% url "reply" object.parent.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                            {{ object.parent.get_body_preview }}
+                        </a>
+                    {% endif %}
                 </td>
                 <td>
                     {% block reply_form %}
@@ -91,13 +98,6 @@
                     {% if object.tag.pk %}
                         <a href="{% url "tagged_messages" object.tag.pk %}">
                             {{ object.tag.get_body_preview }}
-                        </a>
-                    {% endif %}
-                </td>
-                <td class="ChatMessage{% if object.parent %} {% if user.id == object.parent.author.id%}me {% endif %}user_{{ object.parent.author.id }}{% endif %}">
-                    {% if object.parent.pk %}
-                        <a href="{% url "reply" object.parent.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
-                            {{ object.parent.get_body_preview }}
                         </a>
                     {% endif %}
                 </td>
