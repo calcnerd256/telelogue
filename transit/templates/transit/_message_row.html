@@ -77,7 +77,7 @@
                 </td>
                 <td>
                     {% if hide_pk and object.pk %}
-                        <a href="{% url "create_from_three_messages" hide_pk object.pk hide_pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                        {% include "transit/_triple_link_open.html" with source_pk=hide_pk path_pk=object.pk destination_pk=hide_pk %}
                             hide
                         </a>
                     {% endif %}
@@ -86,9 +86,9 @@
                     {% if sticky_pk and object.pk %}
                         {% if object.sticky %}
                             sticky
-                            (<a href="{% url "create_from_three_messages" sticky_pk object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">unstick</a>)
+                            ({% include "transit/_triple_link_open.html" with source_pk=sticky_pk path_pk=object.pk destination_pk=0 %}unstick</a>)
                         {% else %}
-                            <a href="{% url "create_from_three_messages" sticky_pk object.pk object.pk %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                            {% include "transit/_triple_link_open.html" with source_pk=sticky_pk path_pk=object.pk destination_pk=object.pk %}
                                 pin
                             </a>
                         {% endif %}
@@ -106,9 +106,9 @@
                     {% if your_bag %}
                         {% if object.in_bag %}
                             in bag
-                            (<a href="{% url "create_from_three_messages" your_bag.bag.id object.pk 0 %}{% if this_page %}?next={{ this_page }}{% endif %}">remove</a>)
+                            ({% include "transit/_triple_link_open.html" with source_pk=your_bag.bag.id path_pk=object.pk destination_pk=0 %}remove</a>)
                         {% else %}
-                            <a href="{% url "create_from_three_messages" your_bag.bag.id object.pk your_bag.bag.id %}{% if this_page %}?next={{ this_page }}{% endif %}">
+                            {% include "transit/_triple_link_open.html" with source_pk=your_bag.bag.id path_pk=object.pk destination_pk=your_bag.bag.id %}
                                 add to bag
                             </a>
                         {% endif %}
