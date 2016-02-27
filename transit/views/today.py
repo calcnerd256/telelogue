@@ -30,6 +30,10 @@ class DayView(TodayView):
         day = datetime.date(year, month, month_day)
         return day
 
+    def get_page_title(self):
+        day = self.get_date()
+        return "Messages from %s" % day
+
     def get_context_data(self, *args, **kwargs):
         context = super(DayView, self).get_context_data(*args, **kwargs)
         today = self.get_date().toordinal()
