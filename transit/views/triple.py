@@ -1,4 +1,7 @@
-from django.views.generic import CreateView
+from django.views.generic import (
+    CreateView,
+    ListView,
+)
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.forms import HiddenInput
@@ -46,3 +49,14 @@ class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
     def get_context_data(self, result):
         result.update(self.get_messages())
 
+
+class EdgeHistoryView(EnhancedMessageMixin, ListView):
+    template_name = "transit/list.html"
+
+    def get_queryset(self):
+        source_pk = self.kwargs.get("source", None)
+        path_pk = self.kwargs.get("path", None)
+        source = get_object_or_404(self.model, pk=source_pk)
+        path = get_object_or_404(self.model, pk=path_pk)
+        history = Triple.edges.lookup_history(source, path).order_by("-timestamp")
+        return [t.destination for t in history]

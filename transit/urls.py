@@ -14,6 +14,7 @@ from .views import (
     ReplyView,
     CorkboardView,
     CreateBagView,
+    EdgeHistoryView,
 )
 
 admin.autodiscover()
@@ -55,11 +56,25 @@ urlpatterns = [
         name="unmet_semantics",
     ),
     url(
-        r'^triple/create_from/(?P<source>\d+)/(?P<path>\d+)/(?P<destination>\d+)/$',
-        login_required(
-            CreateFromThreeMessagesView.as_view()
-        ),
-        name="create_from_three_messages",
+        r'^triple/',
+        include(
+            [
+                url(
+                    r'^create_from/(?P<source>\d+)/(?P<path>\d+)/(?P<destination>\d+)/$',
+                    login_required(
+                        CreateFromThreeMessagesView.as_view()
+                    ),
+                    name="create_from_three_messages",
+                ),
+                url(
+                    r'^history/(?P<source>\d+)/(?P<path>\d+)/$',
+                    login_required(
+                        EdgeHistoryView.as_view()
+                    ),
+                    name="edge_history",
+                )
+            ]
+        )
     ),
     url(
         r'^message/',

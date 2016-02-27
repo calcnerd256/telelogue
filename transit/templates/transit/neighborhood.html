@@ -8,9 +8,12 @@
     <ul>
         {% for edge in sources %}
             <li>
-                TODO: link to history of triple
                 <ol>
-                    <li>(YOU ARE HERE)</li>
+                    <li>
+                        YOU ARE
+                        (<a href="{% url "edge_history" edge.source.pk edge.path.pk %}">were</a>)
+                        HERE
+                    </li>
                     {% include "transit/_message_preview.html" with object=edge.path %}
                     {% include "transit/_message_preview.html" with object=edge.destination %}
                 </ol>
@@ -21,10 +24,13 @@
     <ul>
         {% for edge in paths %}
             <li>
-                TODO: link to history of triple
                 <ol>
                     {% include "transit/_message_preview.html" with object=edge.source %}
-                    <li>(YOU ARE HERE)</li>
+                    <li>
+                        YOU ARE
+                        (<a href="{% url "edge_history" edge.source.pk edge.path.pk %}">were</a>)
+                        HERE
+                    </li>
                     {% include "transit/_message_preview.html" with object=edge.destination %}
                 </ol>
             </li>
@@ -34,11 +40,14 @@
     <ul>
         {% for edge in destinations %}
             <li>
-                TODO: link to history of triple
                 <ol>
                     {% include "transit/_message_preview.html" with object=edge.source %}
                     {% include "transit/_message_preview.html" with object=edge.path %}
-                    <li>(YOU ARE HERE)</li>
+                    <li>
+                        YOU ARE
+                        (<a href="{% url "edge_history" edge.source.pk edge.path.pk %}">were</a>)
+                        HERE
+                    </li>
                 </ol>
             </li>
         {% endfor %}

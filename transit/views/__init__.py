@@ -1,4 +1,7 @@
-from .triple import CreateFromThreeMessagesView
+from .triple import (
+    CreateFromThreeMessagesView,
+    EdgeHistoryView,
+)
 from .semantics import UnmetSemanticsView
 from .tag import (
     UntaggedMessagesView,

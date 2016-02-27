@@ -54,10 +54,14 @@ class FailSilently(Decorum):
 
 
 class EdgeManager(models.Manager):
-    def lookup(self, source, path, author=NotImplemented):
-        triples = self.filter(source=source, path=path).order_by("-timestamp")
+    def lookup_history(self, source, path, author=NotImplemented):
+        history = self.filter(source=source, path=path)
         if author is not NotImplemented:
-            triples = triples.filter(author=author)
+            history = history.filter(author=author)
+        return history
+
+    def lookup(self, source, path, author=NotImplemented):
+        triples = self.lookup_history(source, path, author).order_by("-timestamp")
         if not triples:
             raise SilentLookupFailure()
         return triples[0].destination
