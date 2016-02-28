@@ -56,7 +56,10 @@ class EdgeHistoryView(EnhancedMessageMixin, ListView):
     def get_queryset(self):
         source_pk = self.kwargs.get("source", None)
         path_pk = self.kwargs.get("path", None)
-        source = get_object_or_404(self.model, pk=source_pk)
-        path = get_object_or_404(self.model, pk=path_pk)
+        source, path = None, None
+        if source_pk and "0" != source_pk:
+            source = get_object_or_404(self.model, pk=source_pk)
+        if path_pk and "0" != path_pk:
+            path = get_object_or_404(self.model, pk=path_pk)
         history = Triple.edges.lookup_history(source, path).order_by("-timestamp")
         return [t.destination for t in history]
