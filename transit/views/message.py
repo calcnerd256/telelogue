@@ -24,12 +24,20 @@ class ChatMessageNeighborhoodView(ChatMessageDetailView):
 
     def get_destinations(self):
         ob = self.get_object()
-        pk = ob.pk
+        pk = ob.pk if ob else 0
+        seen = {}
         for edge in ob.destination_set.all():
             d = edge.current_value()
             if d is not None:
                 if pk == d.pk:
-                    yield edge
+                    s = edge.source
+                    p = edge.path
+                    spk = s.pk if s else 0
+                    ppk = p.pk if p else 0
+                    k = spk, ppk
+                    if k not in seen:
+                        yield edge
+                        seen[k] = True
 
     def get_context_data(self, *args, **kwargs):
         context = super(ChatMessageDetailView, self).get_context_data(*args, **kwargs)

@@ -88,5 +88,10 @@ class TaggedMessagesView(EnhancedMessageMixin, ObjectAndListView):
         potential_edges = tag.destination_set
         if not tag_tag: return [e.path for e in potential_edges]
         edges = potential_edges.filter(source=tag_tag)
-        pks = edges.values_list("path", flat=True)
+        pks = [
+            e.path.pk if e.path is not None else 0
+            for e,v
+            in [(e,e.current_value()) for e in edges]
+            if v is not None and v.pk == tag.pk
+        ]
         return self.model.objects.filter(pk__in=pks)
