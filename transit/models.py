@@ -153,6 +153,15 @@ class Triple(models.Model):
             "destination": self.current_value(),
         }
 
+    def get_absolute_url(self):
+        source = self.source
+        path = self.path
+        kwargs = {
+            "source": source.pk if source is not None else 0,
+            "path": path.pk if path is not None else 0,
+        }
+        return reverse("edge_history", kwargs=kwargs)
+
 
 def patch_on(target, rename=None):
     def result(fn):

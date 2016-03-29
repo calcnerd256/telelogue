@@ -20,7 +20,6 @@ class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
     model = Triple
     page_title = 'Create triple'
     template_name = "transit/triple/create/from_messages.html"
-    success_url = reverse_lazy("untagged_messages")
     message_names = "source path destination".split(" ")
 
     def get_message(self, name):
