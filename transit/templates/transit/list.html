@@ -13,7 +13,8 @@
 {% block after_list %}
     {% include "transit/_message_row.html" with end_table=True %}
     {{ block.super }}
-    {% if your_bag %}
+    {% block bag %}
+      {% if your_bag %}
         <h3>your bag</h3>
         (<a href="{% url "create_bag" %}">clone</a>)
         {% for object in your_bag.contents %}
@@ -26,5 +27,6 @@
             {% endif %}
 
         {% endfor %}
-    {% endif %}
+      {% endif %}
+    {% endblock bag %}
 {% endblock after_list %}

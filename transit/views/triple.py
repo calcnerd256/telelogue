@@ -50,7 +50,7 @@ class CreateFromThreeMessagesView(EnhancedMessageMixin, CreateView):
 
 
 class EdgeHistoryView(EnhancedMessageMixin, ListView):
-    template_name = "transit/list.html"
+    template_name = "transit/triple/history.html"
 
     def get_queryset(self):
         source_pk = self.kwargs.get("source", None)
