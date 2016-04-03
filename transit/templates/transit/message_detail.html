@@ -1,6 +1,7 @@
 {% extends "chat/chatmessage_detail.html" %}
 {% block content %}
     {{ block.super }}
+    {% include "transit/_message_preview.html" %}
     <a href="{% url "raw_message" object.pk %}">raw</a>
     <h2>Sequence</h2>
     {% include "transit/_message_preview.html" with object=object.get_previous %}
