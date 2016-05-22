@@ -14,6 +14,7 @@ from .today import (
 from .message import (
     ChatMessageDetailView,
     ChatMessageNeighborhoodView,
+    ChatMessageNeighborhoodGraphView,
     RawMessageView,
 )
 from .reply import ReplyView

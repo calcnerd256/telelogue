@@ -1,0 +1,41 @@
+digraph "{{ page_title }}" {
+ {% for edge in sources %}
+  {% if edge.path %}
+   "{{ edge.path.pk }}" [tooltip="{{ edge.path.get_body_preview }}", URL="{% url "local_graph" edge.path.pk %}"];
+  {% endif %}
+  {% if edge.destination %}
+   "{{ edge.destination.pk }}" [tooltip="{{ edge.destination.get_body_preview }}", URL="{% url "local_graph" edge.destination.pk %}"];
+  {% endif %}
+  {% if edge.source.pk %}
+   {% if edge.path.pk %}
+    "{{ edge.path.pk }}" -> "{{ edge.destination.pk }}" [color="red", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+   {% endif %}
+  {% endif %}
+ {% endfor %}
+ {% for edge in paths %}
+  {% if edge.source %}
+   "{{ edge.source.pk }}" [tooltip="{{ edge.source.get_body_preview }}", URL="{% url "local_graph" edge.source.pk %}"];
+  {% endif %}
+  {% if edge.destination %}
+   "{{ edge.destination.pk }}" [tooltip="{{ edge.destination.get_body_preview }}", URL="{% url "local_graph" edge.destination.pk %}"];
+  {% endif %}
+  {% if edge.source.pk %}
+   {% if edge.path.pk %}
+    "{{ edge.source.pk }}" -> "{{ edge.destination.pk }}" [color="green", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+   {% endif %}
+  {% endif %}
+ {% endfor %}
+ {% for edge in destinations %}
+  {% if edge.source %}
+   "{{ edge.source.pk }}" [tooltip="{{ edge.source.get_body_preview }}", URL="{% url "local_graph" edge.source.pk %}"];
+  {% endif %}
+  {% if edge.path %}
+   "{{ edge.path.pk }}" [tooltip="{{ edge.path.get_body_preview }}", URL="{% url "local_graph" edge.path.pk %}"];
+  {% endif %}
+  {% if edge.source.pk %}
+   {% if edge.path.pk %}
+    "{{ edge.source.pk }}" -> "{{ edge.path.pk }}" [color="blue", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+   {% endif %}
+  {% endif %}
+ {% endfor %}
+}

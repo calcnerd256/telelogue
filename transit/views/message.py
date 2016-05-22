@@ -1,4 +1,6 @@
 import base64
+import subprocess
+
 from django.views.generic.detail import (
     DetailView,
     BaseDetailView,
@@ -48,6 +50,18 @@ class ChatMessageNeighborhoodView(ChatMessageDetailView):
         )
         context["destinations"] = list(self.get_destinations())
         return context
+
+
+class ChatMessageNeighborhoodGraphView(ChatMessageNeighborhoodView):
+    template_name = "transit/neighborhood.dot"
+
+    def render_to_response(self, context, **kwargs):
+        response = super(ChatMessageNeighborhoodGraphView, self).render_to_response(context, **kwargs)
+        response.render()
+        response["Content-Type"] = "image/svg+xml"
+        kid = subprocess.Popen(["twopi", "-Tsvg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        response.content, _ = kid.communicate(response.content)
+        return response
 
 
 class RawMessageView(EnhancedMessageMixin, BaseDetailView):

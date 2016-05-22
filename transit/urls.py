@@ -10,6 +10,7 @@ from .views import (
     TaggedMessagesView,
     ChatMessageDetailView,
     ChatMessageNeighborhoodView,
+    ChatMessageNeighborhoodGraphView,
     RawMessageView,
     ReplyView,
     CorkboardView,
@@ -106,11 +107,25 @@ urlpatterns = [
                                 name="transit_message_detail",
                             ),
                             url(
-                                r'^incident/$',
-                                login_required(
-                                    ChatMessageNeighborhoodView.as_view()
-                                ),
-                                name="message_edges",
+                                r'^incident/',
+                                include(
+                                    [
+                                        url(
+                                            r'^$',
+                                            login_required(
+                                                ChatMessageNeighborhoodView.as_view()
+                                            ),
+                                            name="message_edges",
+                                        ),
+                                        url(
+                                            r'^dot/$',
+                                            login_required(
+                                                ChatMessageNeighborhoodGraphView.as_view()
+                                            ),
+                                            name="local_graph"
+                                        ),
+                                    ]
+                                )
                             ),
                             url(
                                 r'^raw/$',
