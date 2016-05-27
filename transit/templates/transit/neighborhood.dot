@@ -1,5 +1,7 @@
 digraph "{{ page_title }}" {
+ graph [overlap="voronoi", splines="true"];
  {% for edge in sources %}
+ {% if edge.destination.pk %}
   {% if edge.path %}
    "{{ edge.path.pk }}" [tooltip="{{ edge.path.get_body_preview }}", URL="{% url "local_graph" edge.path.pk %}"];
   {% endif %}
@@ -11,8 +13,11 @@ digraph "{{ page_title }}" {
     "{{ edge.path.pk }}" -> "{{ edge.destination.pk }}" [color="red", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
    {% endif %}
   {% endif %}
+ {% endif %}
  {% endfor %}
+
  {% for edge in paths %}
+ {% if edge.destination.pk %}
   {% if edge.source %}
    "{{ edge.source.pk }}" [tooltip="{{ edge.source.get_body_preview }}", URL="{% url "local_graph" edge.source.pk %}"];
   {% endif %}
@@ -24,7 +29,9 @@ digraph "{{ page_title }}" {
     "{{ edge.source.pk }}" -> "{{ edge.destination.pk }}" [color="green", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
    {% endif %}
   {% endif %}
+ {% endif %}
  {% endfor %}
+
  {% for edge in destinations %}
   {% if edge.source %}
    "{{ edge.source.pk }}" [tooltip="{{ edge.source.get_body_preview }}", URL="{% url "local_graph" edge.source.pk %}"];
