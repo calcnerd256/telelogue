@@ -10,7 +10,7 @@ digraph "{{ page_title }}" {
   {% endif %}
   {% if edge.source.pk %}
    {% if edge.path.pk %}
-    "{{ edge.path.pk }}" -> "{{ edge.destination.pk }}" [color="red", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+    "{{ edge.path.pk }}" -> "{{ edge.destination.pk }}" [color="red", URL="{% url "edge_history" edge.source.pk edge.path.pk %}", headport="n"];
    {% endif %}
   {% endif %}
  {% endif %}
@@ -26,7 +26,7 @@ digraph "{{ page_title }}" {
   {% endif %}
   {% if edge.source.pk %}
    {% if edge.path.pk %}
-    "{{ edge.source.pk }}" -> "{{ edge.destination.pk }}" [color="green", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+    "{{ edge.source.pk }}" -> "{{ edge.destination.pk }}" [color="green", URL="{% url "edge_history" edge.source.pk edge.path.pk %}", headport="sw"];
    {% endif %}
   {% endif %}
  {% endif %}
@@ -41,7 +41,7 @@ digraph "{{ page_title }}" {
   {% endif %}
   {% if edge.source.pk %}
    {% if edge.path.pk %}
-    "{{ edge.source.pk }}" -> "{{ edge.path.pk }}" [color="blue", URL="{% url "edge_history" edge.source.pk edge.path.pk %}"];
+    "{{ edge.source.pk }}" -> "{{ edge.path.pk }}" [color="blue", URL="{% url "edge_history" edge.source.pk edge.path.pk %}", headport="se"];
    {% endif %}
   {% endif %}
  {% endfor %}
