@@ -9,10 +9,12 @@
                 {{ object.author }}
             </a>
     </div>
-    <div>
+    {% block when_posted %}
+        <div>
             Posted at:
             {{ object.timestamp }}
-    </div>
+	</div>
+    {% endblock when_posted %}
     <div>
             Body of message:
             <br />

@@ -21,3 +21,11 @@
         </a>
     {% endif %}
 {% endblock content %}
+{% block when_posted %}
+    <div>
+        Posted at:
+        <a href="{% url "day" year=object.timestamp.year month=object.timestamp.month day=object.timestamp.day %}">
+            {{ object.timestamp|date }}</a>,
+        {{ object.timestamp|date:"g:i a" }}
+    </div>
+{% endblock %}
